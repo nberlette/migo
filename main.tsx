@@ -430,7 +430,7 @@ const handle = {
               </strong>, to anyone in the whole world.
             </p>
             <p class="my-1.5 md:my-2 text-base md:text-lg text-center">
-              <Link url="https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo.deno.dev">
+              <Link url="https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo">
                 Deploy your own with Deno!
               </Link>.
             </p>
