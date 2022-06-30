@@ -28,14 +28,13 @@ import {
  * Authenticate and configure DurableKV and KV
  * @see {@link https://gokv.io}
  */
-if (!token) console.error("Missing GOKV_TOKEN environment variable!");
 $.config({ token });
 const $kv = $.KV({ namespace });
 
 /**
  * Heading component (JSX)
  */
-function Heading({
+const Heading = ({
   level = "h2",
   title,
   children,
@@ -46,7 +45,7 @@ function Heading({
   level?: HeadingLevel;
   title?: string;
   className?: any;
-} & Record<string, any>) {
+} & Record<string, any>) => {
   if (typeof className === "string") {
     className = className.split(" ");
   }
@@ -176,7 +175,7 @@ const RouteSchema = ({
         )}
         <Divider text=".(" />
         <Link
-          url="/#format-svg-or-png-raster"
+          url="/#format"
           title="Use the extension .svg for the raw vector, or .png to return a rasterized copy of it"
           weight="text-sm font-semibold"
         >
@@ -293,10 +292,10 @@ const handle = {
       if (new URL(iconUrl).pathname.endsWith(".svg")) {
         iconType = "svg";
         iconContents = iconContents
-          .replace(/^<svg ([^>]+)>/i, '<symbol id="icon" $1>')
+          .replace(/^<svg/i, '<symbol id="icon"')
           .replace(/<\/svg>/i, "</symbol>");
         // adjust size of viewBox to account for stroke-width
-        if (iconStroke !== "none" && +iconStrokeWidth > 0) {
+        if (iconStroke !== "none") {
           iconContents = iconContents.replace(
             /(?<=viewBox=['"])([^'"]+)(?=['"])/i,
             (m) => adjustViewBox(+iconStrokeWidth)(m),
@@ -321,7 +320,7 @@ const handle = {
   ${iconType === "svg" ? `<defs>${iconContents}</defs>` : ""}
   <g stroke="none" fill="none" fill-rule="evenodd">
     ${
-      (searchParams.has("noIcon") || JSON.parse(icon) === false)
+      (searchParams.has("noIcon") || icon === "false")
         ? ""
         : (iconType === "svg"
           ? `<use href="#icon" color="${
@@ -459,9 +458,9 @@ const handle = {
             <Heading title="Parameters">Parameters</Heading>
             <p class="my-2 text-sm">
               There are numerous parameters you can provide in the{" "}
-              <a href="https://mdn.io/URLSearchParams" target="_blank">
+              <Link url="https://mdn.io/URLSearchParams" target="_blank">
                 image URL's query string
-              </a>{" "}
+              </Link>{" "}
               to customize the look and feel of the generated image.
             </p>
             <pre
@@ -585,40 +584,42 @@ const handle = {
       ),
     });
   },
-};
-
-serve({
-  "/": handle.home,
-  // handle "static" assets first
-  "/favicon.:ext(ico|svg)": (req: Request, _connInfo: ConnInfo, _params: any) =>
-    fetch("https://icns.deno.dev/mdi:alpha-o-circle-outline:dynamic.svg")
-      .then(async (res) => res.ok && await res.arrayBuffer())
-      .then((buf) =>
-        new Response(buf, {
-          headers: {
-            "access-control-allow-origin": "*",
-            "content-type": "image/svg+xml;charset=utf-8",
-            "content-length": `${buf.byteLength}`,
-            "cache-control": cacheTerm[
-              new URL(req.url).searchParams.has("no-cache") ? "none" : "long"
-            ],
-          },
-        } as ResponseInit)
-      ),
-  "/robots.txt": (req: Request, _connInfo: ConnInfo, _params: any) =>
-    new Response(`User-agent: *\nDisallow:\n`, {
+  async favicon(req: Request, connInfo: ConnInfo, params: PathParams) {
+    const res = await fetch("https://icns.deno.dev/mdi:alpha-m-circle-outline:dynamic.svg")
+    const favicon = await res.arrayBuffer()
+    return new Response(favicon, {
+        headers: {
+          "access-control-allow-origin": "*",
+          "content-type": "image/svg+xml;charset=utf-8",
+          "content-length": `${favicon.byteLength}`,
+          "cache-control": cacheTerm.long,
+        },
+      } as ResponseInit)
+  },
+  robotsTxt(req: Request, connInfo: ConnInfo, params: PathParams) {
+    return new Response(`User-agent: *\nDisallow:\n`, {
       headers: {
         "access-control-allow-origin": "*",
         "content-type": "text/plain;charset=utf-8",
       },
-    }),
+    })
+  }
+};
+
+serve({
+  // home plate
+  "/": handle.home,
+  // handle "static" assets first
+  "/favicon.:ext(ico|svg)": handle.favicon,
+  // do it for the seo fam
+  "/robots.txt": handle.robotsTxt,
   // params, title, subtitle, and extension
   "/:params/:title/:subtitle([^]+?).:type(png|svg)": handle.image,
   // params, title, extension
   "/:params/:title([^]+?).:type(png|svg)": handle.image,
   // just a title and extension
   "/:title([^]+?).:type(png|svg)": handle.image,
-  // handle extensionless requests, redirect to .png
+  // redirect to .png if no extension
   "/:wheresmyextension([^]+?)": handle.image,
   404: handle.home,
 } as Routes);
