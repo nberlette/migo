@@ -43,7 +43,7 @@ There are numerous parameters you can use to control the look and feel of the ge
 
 Allowed delimiters for the path-style schema are `&` (ampersand), `;` (semi-colon), or `::` (double-colon). 
 
-<pre><code>https://migo.deno.dev/<strong>bgColor=white;titleColor=black;icon=typescript</strong>/Title.png</code></pre>
+<pre><code>https://migo.deno.dev/<strong>bgColor=white&titleColor=black&icon=typescript</strong>/Title.png</code></pre>
 
 #### Query String
 
