@@ -20,19 +20,30 @@
 
 ## Schema
 
-<pre><code>migo.deno.dev/<strong>:title</strong>.(png|svg)</code></pre>
-<pre><code>migo.deno.dev/<strong>:title</strong>/<strong>:subtitle</strong>.(png|svg)</code></pre>
+<pre><code>migo.deno.dev/<strong>:title</strong>.(png|svg)?<strong>:params</strong></code></pre>
+<pre><code>migo.deno.dev/<strong>:title</strong>/<strong>:subtitle</strong>.(png|svg)?<strong>:params</strong></code></pre>
 <pre><code>migo.deno.dev/<strong>:params</strong>/<strong>:title</strong>.(png|svg)</code></pre>
 <pre><code>migo.deno.dev/<strong>:params</strong>/<strong>:title</strong>/<strong>:subtitle</strong>.(png|svg)</code></pre>
+
+## Formats
+
+Every image is initially sculpted as an SVG ([Scalable Vector Graphics][svg]),
+and you can optionally add the extension **`.svg`** to force that format in the
+response.  
+
+Unfortunately most social media platforms don't support social images
+in SVG format yet, so requests without an `.{svg,png}` extension are redirected
+to `.png` prior to rendering.
 
 ## Icons
 
 Icons are embedded from [**icns**][icns], another Deno-powered
 project of mine. This means direct access to **over 100,000 icons**, and
-**millions of color combinations**. To add an icon to an OG image, you can set
-the `icon` param to the icon slug in Iconify format, like so:
+**millions of color combinations**.  
 
-> `icon={collection}:{icon}` (e.g. `...ogimage.png?icon=tabler:brand-github`).
+To add an icon to an OG image, use the slug (in Iconify format) for the `icon` param, like so:
+
+> `icon={collection}:{icon}` (e.g. `?icon=tabler:brand-github`).
 
 A great tool to browse the available icons and make a selection is [**icones**][icones] by [Anthony Fu][antfu].
 
@@ -40,21 +51,6 @@ You can also use an override `iconUrl` parameter, with an encoded URI you'd like
 to embed, e.g.:
 
 > `icon=https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2Fremojansen%2Flogo.ts%40master%2Fts.svg`
-
-## Formats
-
-Every image is initially sculpted as an SVG ([Scalable Vector Graphics][svg]),
-and you can optionally add the extension **`.svg`** to force that format in the
-response. Unfortunately most social media platforms don't support social images
-in SVG format yet, so requests without an `.{svg,png}` extension are redirected
-to `.png` prior to rendering.
-
-## Performance
-
-The only lag you might encounter is the very first time an image is requested
-(this is unavoidable due to the render/raster steps). Thankfully, your users
-should essentially never be the ones encountering that lag time; they get a
-cache hit from their nearest edge datacenter.
 
 ## Parameters
 
@@ -126,10 +122,21 @@ subtitleStrokeWidth = "2",
 
 ---
 
+## Performance  
+
+The only lag you might encounter is the very first time an image is requested
+(this is unavoidable due to the render/raster steps). Thankfully, your users
+should essentially never be the ones encountering that lag time; they get a
+cache hit from their nearest edge datacenter.
+
+---
+
 ## Examples
 
-![Edge-rendered OpenGraph Images on Deno][example-1]\
-![Creating Dynamic Social Cover Images][example-2]\
+![Edge-rendered OpenGraph Images on Deno][example-1]
+
+![Creating Dynamic Social Cover Images][example-2]
+
 ![Nuxt Content Wind Starter][example-3]
 
 ---
@@ -151,7 +158,7 @@ MIT © [Nicholas Berlette][nberlette]
 [resvg]: https://deno.land/x/resvg_wasm, "Resvg Wasm"
 [deno]: https://deno.com/deploy, "Deno Deploy"
 [deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo, "Deploy with Deno!"
-[examples]: #examples, "Click here for example OpenGraph Images"
+[examples]: ./#examples, "Click here for example OpenGraph Images"
 [example-0]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Click%20here%20for%20example%20OpenGraph%20Images/(or%20scroll%20down).png
 [example-1]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png
 [example-2]: https://migo.deno.dev/icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48/Creating%20Dynamic%20Social%20Cover%20Images/By%20Nicholas%20Berlette.png
