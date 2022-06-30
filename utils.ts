@@ -23,10 +23,8 @@ export const fmtkey = (
 
 /**
  * Create slugs from titles
- * @TODO: fix this redudancy
  */
-const slugger = new Slugger();
-export const slugify = (s: string) => slugger.slug(s);
+export const slugify = (s: string) => Slugger.slug(s);
 
 /**
  * Extracts and parses parameters from search query or from the path.
@@ -72,9 +70,8 @@ export const toStringTagIs = (
  */
 export function createSrcSet(url: string, sizes = [1280, 640, 480]): string {
   const originalWidth = 1280;
-  // return `${url}?pxRatio=1 1280w, ${u}?pxRatio=0.5 640w, ${u}?pxRatio=${480 / 1280} 480w`
   return sizes.map((size) =>
-    `${url}${(new URL(url).search === "") ? "?" : "&"}pxRatio=${
+    `${url}${url.includes("?") ? "&" : "?"}pxRatio=${
       size / originalWidth
     } ${size}w`
   ).join(", ");
@@ -85,11 +82,7 @@ export function createSrcSet(url: string, sizes = [1280, 640, 480]): string {
  * without any clipping along the borders of the icon.
  * @example adjustViewBox(2)("0 0 24 24") // -> "-4 -4 32 32"
  * @param s the stroke width to use as an adjustment factor
- * @returns formatted viewBox value with new dimensions
+ * @returns replacer function to formatted viewBox value using `str.replace`
  */
-export const adjustViewBox = (s: number) =>
-  (match: string) => {
-    // parse the 4 elements of the icon's existing viewBox
-    const [x, y, w, h] = match.split(/[\s ]+/ig, 4).map((v) => +v);
-    return `${x - (s * 2)} ${y - (s * 2)} ${w + (s * 4)} ${h + (s * 4)}`;
-  };
+export const adjustViewBox = (s: number | string) => (m: string) => 
+  m.split(/[\s ]+/g, 4).map((v, i) => i < 2 ? (+v - (+s * 2)) : (+v + (+s * 4))).join(" ");
