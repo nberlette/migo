@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+.*.log
+.env*
+!.env.project
+!.env.example
+!.env.default*
+.*.save
+.*.swp
+*.save
+*.swp
+.*~
+*~
