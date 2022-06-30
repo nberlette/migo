@@ -1,16 +1,22 @@
 <div align="center">
 <h1><a href="https://migo.deno.dev" target="_blank" rel="noopener">migo.deno.dev<img src="https://icns.ml/deno.svg?stroke=black&stroke-width=0.5&color=white&stroke-linejoin=round" width="44" align="left" alt=""></a><!-- -->   <!-- -->   <!-- -->   <!-- --><br clear="all"></h1>
 
-***Generate dynamic OpenGraph images on Deno's Edge Network***
+_**Generate dynamic OpenGraph images on Deno's Edge Network**_
 
 </div><br />
 
-- [x] Just-in-time rendering with a globally deployed worker on [**Deno Deploy**][deno]
-- [x] Images cached as immutable assets with [**Cloudflare KV**][kv] for a blistering response.
-- [x] Rendered as **`.svg`** and rasterized as **`.png`** with [**`resvg_wasm`**][resvg]
-- [x] Integrated with the whole [**Iconify Collection**][iconify], thanks to [**icns.ml**][icns]
-- [x] [**Parameters** allow complete control](#parameters) of colors, dimensions, icon, and text.
-- [ ] `TODO` web form for user-friendly image generation ([see Vercel's solution][vercel])
+- [x] Just-in-time rendering with a globally deployed worker on
+      [**Deno Deploy**][deno]
+- [x] Images cached as immutable assets with [**Cloudflare KV**][kv] for a
+      blistering response.
+- [x] Rendered as **`.svg`** and rasterized as **`.png`** with
+      [**`resvg_wasm`**][resvg]
+- [x] Integrated with the whole [**Iconify Collection**][iconify], thanks to
+      [**icns.ml**][icns]
+- [x] [**Parameters** allow complete control](#parameters) of colors,
+      dimensions, icon, and text.
+- [ ] `TODO` web form for user-friendly image generation
+      ([see Vercel's solution][vercel])
 
 <br />
 
@@ -29,23 +35,25 @@
 
 Every image is initially sculpted as an SVG ([Scalable Vector Graphics][svg]),
 and you can optionally add the extension **`.svg`** to force that format in the
-response.  
+response.
 
-Unfortunately most social media platforms don't support social images
-in SVG format yet, so requests without an `.{svg,png}` extension are redirected
-to `.png` prior to rendering.
+Unfortunately most social media platforms don't support social images in SVG
+format yet, so requests without an `.{svg,png}` extension are redirected to
+`.png` prior to rendering.
 
 ## Icons
 
-Icons are embedded from [**icns**][icns], another Deno-powered
-project of mine. This means direct access to **over 100,000 icons**, and
-**millions of color combinations**.  
+Icons are embedded from [**icns**][icns], another Deno-powered project of mine.
+This means direct access to **over 100,000 icons**, and **millions of color
+combinations**.
 
-To add an icon to an OG image, use the slug (in Iconify format) for the `icon` param, like so:
+To add an icon to an OG image, use the slug (in Iconify format) for the `icon`
+param, like so:
 
 > `icon={collection}:{icon}` (e.g. `?icon=tabler:brand-github`).
 
-A great tool to browse the available icons and make a selection is [**icones**][icones] by [Anthony Fu][antfu].
+A great tool to browse the available icons and make a selection is
+[**icones**][icones] by [Anthony Fu][antfu].
 
 You can also use an override `iconUrl` parameter, with an encoded URI you'd like
 to embed, e.g.:
@@ -122,7 +130,7 @@ subtitleStrokeWidth = "2",
 
 ---
 
-## Performance  
+## Performance
 
 The only lag you might encounter is the very first time an image is requested
 (this is unavoidable due to the render/raster steps). Thankfully, your users
