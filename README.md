@@ -20,7 +20,7 @@ _**Generate dynamic OpenGraph images on Deno's Edge Network**_
 
 <br />
 
-[![Click here for example OpenGraph Images][example-0]][examples]
+[![Click here for example OpenGraph Images][example-0]](#examples "Click here for example OpenGraph Images")
 
 <br />
 
@@ -163,7 +163,6 @@ MIT © [Nicholas Berlette][nberlette]
 [resvg]: https://deno.land/x/resvg_wasm "Resvg Wasm"
 [deno]: https://deno.com/deploy "Deno Deploy"
 [deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo "Deploy with Deno!"
-[examples]: ./#examples "Click here for example OpenGraph Images"
 [example-0]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Click%20here%20for%20example%20OpenGraph%20Images/(or%20scroll%20down).png
 [example-1]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png
 [example-2]: https://migo.deno.dev/icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48/Creating%20Dynamic%20Social%20Cover%20Images/By%20Nicholas%20Berlette.png
