@@ -468,7 +468,7 @@ const handle = {
                       {param}
                     </span>
                     <span class={value == null ? "hidden" : "inline-block"}>
-                      <span class={commentClsx}>= &quot;</span>
+                      <span class={commentClsx}> = &quot;</span>
                       <span class={valueClsx}>{value}</span>
                       <span class={commentClsx}>
                         &quot;, {comments.length > 0 && comments.join(" ")}
@@ -576,7 +576,7 @@ const handle = {
   },
   async favicon(req: Request, connInfo: ConnInfo, params: PathParams) {
     const res = await fetch(
-      "https://icns.deno.dev/mdi:alpha-m-circle-outline:dynamic.svg",
+      "https://icns.ml/mdi:alpha-m-circle-outline:dynamic.svg",
     );
     const favicon = await res.arrayBuffer();
     return new Response(favicon, {
@@ -599,19 +599,12 @@ const handle = {
 };
 
 serve({
-  // home plate
   "/": handle.home,
-  // handle "static" assets first
   "/favicon.:ext(ico|svg)": handle.favicon,
-  // do it for the seo fam
   "/robots.txt": handle.robotsTxt,
-  // params, title, subtitle, and extension
   "/:params/:title/:subtitle([^]+?).:type(png|svg)": handle.image,
-  // params, title, extension
   "/:params/:title([^]+?).:type(png|svg)": handle.image,
-  // just a title and extension
   "/:title([^]+?).:type(png|svg)": handle.image,
-  // redirect to .png if no extension
   "/:wheresmyextension([^]+?)": handle.image,
   404: handle.home,
 } as Routes);
