@@ -1,0 +1,38 @@
+image: nberlette/gitpod-enhanced:latest
+
+tasks:
+  - # ensure deno is installed before proceeding
+    init: |
+      export PATH="$HOME/.deno/bin:$PATH"
+      which deno &>/dev/null || brew install deno &>/dev/null;
+      gp sync-done listo
+  - # proceed if ready
+    init: gp sync-await listo
+    command: |
+      deno fmt && deno lint
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addLabel: true
+    addBadge: true
+    addCheck: true
+
+vscode:
+  extensions:
+    - github.copilot-nightly
+    - GitHub.copilot-labs
+    - denoland.vscode-deno
+    - vsls-contrib.gistfs
+    - github.vscode-codeql
+    - cschleiden.vscode-github-actions
+    - editorconfig.editorconfig
+    - jock.svg
+    - antfu.iconify
+    - antfu.unocss
+    - redhat.vscode-yaml
+    - jacano.vscode-pnpm
+    - christian-kohler.path-intellisense
