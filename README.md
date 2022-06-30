@@ -16,18 +16,18 @@
 
 ---  
 
-### Schema
+## Schema
 
 <pre><code>https://migo.deno.dev/<strong>:title</strong>.(png|svg)</code></pre>
 <pre><code>https://migo.deno.dev/<strong>:title</strong>/<strong>:subtitle</strong>.(png|svg)</code></pre>
 <pre><code>https://migo.deno.dev/<strong>:params</strong>/<strong>:title</strong>.(png|svg)</code></pre>
 <pre><code>https://migo.deno.dev/<strong>:params</strong>/<strong>:title</strong>/<strong>:subtitle</strong>.(png|svg)</code></pre>
 
-### Icons
+## Icons
 
-Icons are embedded from [**icns**](https://icns.ml), another Deno-powered project of mine. This means direct access to **over 100,000 icons**, and **millions of color combinations**.
+Icons are embedded from [**icns**](https://icns.ml), another Deno-powered project of mine. This means direct access to **over 100,000 icons**, and **millions of color combinations**. You can use [**icones.js.org**](https://icones.js.org) by [Anthony Fu][antfu] to browse through all available icons and collections and select the right one for your image.
 
-### Formats
+## Formats
 
 Every image is initially sculpted as an SVG ([Scalable Vector Graphics][svg]), and you can optionally add the extension **`.svg`** to force that format in the response. Unfortunately most social media platforms don't support social images in SVG format yet, so requests without an `.{svg,png}` extension are redirected to `.png` prior to rendering.
 
@@ -98,6 +98,10 @@ subtitleStrokeWidth = "2",
 ## Examples
 
 ![Edge-rendered OpenGraph Images on Deno](https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png)
+
+![Edge-rendered OpenGraph Images on Deno](https://migo.deno.dev/icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png)
+
+![Nuxt Content Wind Starter](https://migo.deno.dev/icon=nuxtdotjs;bgColor=112233;iconColor=00DC82;iconStroke=00DC82;iconStrokeWidth=0.55;titleColor=00DC82;subtitleColor=e0e0e0;iconW=300;iconY=50;titleY=460/Nuxt%20ContentWind%20Starter/stackblitz.com%2fedit%2fcontent-wind.png)
 
 ---  
 <div align="center">
