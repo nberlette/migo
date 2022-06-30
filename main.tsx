@@ -7,6 +7,7 @@ import {
   namespace,
   paramList,
   siteMeta,
+  token,
   TTL_1Y,
 } from "~/constants.ts";
 import {
@@ -27,7 +28,8 @@ import {
  * Authenticate and configure DurableKV and KV
  * @see {@link https://gokv.io}
  */
-$.config({ token: Deno.env.get("GOKV_TOKEN") });
+if (!token) console.error("Missing GOKV_TOKEN environment variable!");
+$.config({ token });
 const $kv = $.KV({ namespace });
 
 /**
@@ -271,7 +273,7 @@ const handle = {
       subtitleY = (+titleY + (+subtitleFontSize * 2)),
     }: Record<string, any> = Object.fromEntries([...searchParams.entries()]);
 
-    let iconContents: string, iconType = "";
+    let iconContents = "", iconType = "";
 
     if (icon != null) {
       icon = dec(icon ?? "deno");
@@ -293,6 +295,13 @@ const handle = {
         iconContents = iconContents
           .replace(/^<svg ([^>]+)>/i, '<symbol id="icon" $1>')
           .replace(/<\/svg>/i, "</symbol>");
+        // adjust size of viewBox to account for stroke-width
+        if (iconStroke !== "none" && +iconStrokeWidth > 0) {
+          iconContents = iconContents.replace(
+            /(?<=viewBox=['"])([^'"]+)(?=['"])/i,
+            (m) => adjustViewBox(+iconStrokeWidth)(m),
+          );
+        }
       } else {
         iconType = "other";
       }
@@ -309,17 +318,7 @@ const handle = {
   <rect fill="${
       formatHex(parseColor(bgColor))
     }" x="0" y="0" width="${width}" height="${height}" />
-  ${
-      iconType === "svg"
-        ? `<defs>${
-          iconStroke === "none"
-            ? iconContents // do not mutate viewBox if no stroke is set
-            : iconContents // adjust size of viewBox to account for stroke-width
-              .replace(/(?<=viewBox=['"])([^'"]+)(?=['"])/i, (m) =>
-                adjustViewBox(+iconStrokeWidth)(m))
-        }</defs>`
-        : ""
-    }
+  ${iconType === "svg" ? `<defs>${iconContents}</defs>` : ""}
   <g stroke="none" fill="none" fill-rule="evenodd">
     ${
       (searchParams.has("noIcon") || JSON.parse(icon) === false)
@@ -327,9 +326,8 @@ const handle = {
         : (iconType === "svg"
           ? `<use href="#icon" color="${
             formatHex(parseColor(iconColor))
-          }" stroke="${formatHex(parseColor(iconStroke))}" stroke-width="${
-            iconStrokeWidth ?? 0
-          }"`
+          }" stroke="${formatHex(parseColor(iconStroke))}"
+          stroke-width="${iconStrokeWidth ?? 0}"`
           : `<image href="${iconUrl}"`) +
           ` width="${iconW}" height="${iconH}" x="${iconX}" y="${iconY}" />`
     }
@@ -344,9 +342,7 @@ const handle = {
       stroke-width="${titleStrokeWidth}"
       x="${titleX}"
       y="${titleY}"
-    >
-      <tspan>${dec(title)}</tspan>
-    </text>
+    ><tspan>${dec(title)}</tspan></text>
     ${
       subtitle
         ? `<text
@@ -360,9 +356,7 @@ const handle = {
       stroke-width="${subtitleStrokeWidth}"
       x="${subtitleX}"
       y="${subtitleY}"
-    >
-        <tspan>${dec(subtitle)}</tspan>
-    </text>`
+    ><tspan>${dec(subtitle)}</tspan></text>`
         : ""
     }
   </g>

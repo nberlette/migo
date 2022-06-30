@@ -1,6 +1,7 @@
 import { enc } from "~/utils.ts";
 
 export const namespace = Deno.env.get("GOKV_NAMESPACE") || "migo";
+export const token = Deno.env.get("GOKV_TOKEN") || null;
 
 /**
  * various cache TTL values, from 1 minute to 1 year
