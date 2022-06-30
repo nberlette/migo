@@ -104,18 +104,14 @@ const ExampleImage = ({
   title = meta["og:title"],
   width = "640",
   height = "320",
+  sizes = "50vw",
   ...props
-}: {
-  src: string;
-  title?: string;
-  width?: string | number;
-  height?: string | number;
-}) => (
+}: Record<string, any>) => (
   <Link title={title} url={encodeURI(dec(src))} plain="true">
     <img
       src={src}
       srcset={createSrcSet(src)}
-      sizes="50vw"
+      sizes={sizes}
       alt={title}
       class="rounded-lg border border-2 border-gray-100 shadow-sm dark:!border-gray-900 hover:shadow-md transition-all duration-500 my-2 max-w-full h-auto"
       width={width}
@@ -131,8 +127,8 @@ const ExampleImage = ({
 const RouteSchema = ({
   prefix = "migo.deno.dev",
   params = ":params",
+  title = ":title",
   subtitle = ":subtitle",
-  ...props
 }: Record<string, any>) => {
   const Divider = ({ text = "/" }) => (
     <span class="text-sm text-gray-700 dark:!text-blue-gray-300 font-medium">
@@ -161,7 +157,7 @@ const RouteSchema = ({
           url="/#title"
           title="Use the first argument for your title, the large text on the top line."
         >
-          :title
+          {title ?? ":title"}
         </Link>
         {subtitle && <Divider />}
         {subtitle && (
@@ -170,7 +166,7 @@ const RouteSchema = ({
             title="Optionally add a subtitle or author name in a second segment."
             weight="font-regular text-sm"
           >
-            :subtitle
+            {subtitle ?? ":subtitle"}
           </Link>
         )}
         <Divider text=".(" />
@@ -258,7 +254,7 @@ const handle = {
       subtitleStroke = "none",
       subtitleStrokeWidth = "2",
       icon = "deno",
-      iconUrl = `https://icns.deno.dev/${icon}.svg`,
+      iconUrl = `https://icns.ml/${icon}.svg`,
       iconColor = null,
       iconStroke = "none",
       iconStrokeWidth = "2",
@@ -390,15 +386,6 @@ const handle = {
       ));
   },
   home(req: Request, connInfo: ConnInfo, params: PathParams) {
-    const url = new URL(req.url);
-    const { searchParams } = url;
-    if (searchParams.has("svg") && searchParams.has("title")) {
-      return handle.image(req.clone(), connInfo, {
-        ...params,
-        title: searchParams.get("title"),
-      });
-    }
-
     const commentClsx =
       "text-gray-900 tracking-tight dark:!text-gray-50 text-xs md:text-sm inline-block";
     const paramClsx =
@@ -498,9 +485,8 @@ const handle = {
             </Heading>
             <p class="my-1.5 md:my-2 text-sm md:text-base">
               Icons are embedded from{" "}
-              <Link url="https://icns.deno.dev">icns</Link>, another
-              Deno-powered project of mine. This means direct access to over
-              {" "}
+              <Link url="https://icns.ml">icns</Link>, another Deno-powered
+              project of mine. This means direct access to over{" "}
               <strong>100,000 icons</strong>, and millions of color combinations
               - only a parameter away.
             </p>
@@ -562,12 +548,16 @@ const handle = {
             {/* Footer */}
             <p class="text-sm text-center border-t border-gray-200 dark:border-blue-gray-700 pt-6 pb-2 my-4">
               Open Source Software by{" "}
-              <Link url="https://github.com/nberlette">Nicholas Berlette</Link>
+              <Link
+                url="https://github.com/nberlette"
+                title="View Nicholas Berlette's GitHub Profile"
+              >
+                Nicholas Berlette
+              </Link>
             </p>
             <footer class="prose text-center pt-2 border-t border-gray-200 dark:!border-blue-gray-700">
-              <a
-                href="https://github.com/nberlette"
-                class="no-underline"
+              <Link
+                url="https://github.com/nberlette"
                 title="View Nicholas Berlette's GitHub Profile"
               >
                 <img
@@ -577,7 +567,7 @@ const handle = {
                   class="inline-block w-8 h-8 mx-auto my-2"
                   alt="Nicholas Berlette's Logomark in a pretty shade of green"
                 />
-              </a>
+              </Link>
             </footer>
           </div>
         </div>
