@@ -62,7 +62,7 @@ const Heading = ({
     ariaLabel: title,
     ...props,
   }, children);
-}
+};
 
 /**
  * Link component (JSX)
@@ -585,16 +585,18 @@ const handle = {
     });
   },
   async favicon(req: Request, connInfo: ConnInfo, params: PathParams) {
-    const res = await fetch("https://icns.deno.dev/mdi:alpha-m-circle-outline:dynamic.svg")
-    const favicon = await res.arrayBuffer()
+    const res = await fetch(
+      "https://icns.deno.dev/mdi:alpha-m-circle-outline:dynamic.svg",
+    );
+    const favicon = await res.arrayBuffer();
     return new Response(favicon, {
-        headers: {
-          "access-control-allow-origin": "*",
-          "content-type": "image/svg+xml;charset=utf-8",
-          "content-length": `${favicon.byteLength}`,
-          "cache-control": cacheTerm.long,
-        },
-      } as ResponseInit)
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "image/svg+xml;charset=utf-8",
+        "content-length": `${favicon.byteLength}`,
+        "cache-control": cacheTerm.long,
+      },
+    } as ResponseInit);
   },
   robotsTxt(req: Request, connInfo: ConnInfo, params: PathParams) {
     return new Response(`User-agent: *\nDisallow:\n`, {
@@ -602,8 +604,8 @@ const handle = {
         "access-control-allow-origin": "*",
         "content-type": "text/plain;charset=utf-8",
       },
-    })
-  }
+    });
+  },
 };
 
 serve({
