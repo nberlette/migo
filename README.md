@@ -45,15 +45,13 @@ format yet, so requests without an `.{svg,png}` extension are redirected to
 
 Icons are embedded from [**icns**][icns], another Deno-powered project of mine.
 This means direct access to **over 100,000 icons**, and **millions of color
-combinations**.
+combinations**. A great tool to browse the available icons and make a selection is
+[**icones**][icones] by [Anthony Fu][antfu].
 
 To add an icon to an OG image, use the slug (in Iconify format) for the `icon`
 param, like so:
 
 > `icon={collection}:{icon}` (e.g. `?icon=tabler:brand-github`).
-
-A great tool to browse the available icons and make a selection is
-[**icones**][icones] by [Anthony Fu][antfu].
 
 You can also use an override `iconUrl` parameter, with an encoded URI you'd like
 to embed, e.g.:
@@ -72,16 +70,15 @@ For the best caching potential, I recommend only using the path-style parameters
 on your images. Some CDN providers have unexpected caching behavior when assets
 have query string parameters in their URI.
 
-Allowed delimiters are `&` (ampersand), `;` (semi-colon), or `::`
-(double-colon).
-
 <pre><code>migo.deno.dev/<strong>bgColor=white&titleColor=black&icon=typescript</strong>/Title.png</code></pre>
+
+> **Note**: Allowed delimiters are `&` (ampersand), `;` (semi-colon), or `::`.
 
 ### Query String
 
-Query string params **must** use the standard `&` (ampersand) delimiter.
-
 <pre><code>migo.deno.dev/Title.png?<strong>bgColor=white&titleColor=black&icon=typescript</strong></code></pre>
+
+> **Note**: Query string params **must** use the `&` (ampersand) delimiter.
 
 ### Default Values
 
@@ -155,18 +152,18 @@ MIT © [Nicholas Berlette][nberlette]
 
 </div>
 
-[nberlette]: https://github.com/nberlette, "Nicholas Berlette"
-[icns]: https://icns.ml, "icns - SVG as a Service"
-[antfu]: https://github.com/antfu, "Anthony Fu"
-[icones]: https://icones.js.org, "Browse every Iconify Collection with Icones"
-[vercel]: https://og-image.vercel.app, "Vercel's OG Image App"
-[iconify]: https://iconify.design, "Iconify Project Homepage"
-[kv]: https://developers.cloudflare.com/workers/runtime-apis/kv, "Cloudflare KV"
-[svg]: https://w3.org/TR/SVG, "SVG Specification from W3.org"
-[resvg]: https://deno.land/x/resvg_wasm, "Resvg Wasm"
-[deno]: https://deno.com/deploy, "Deno Deploy"
-[deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo, "Deploy with Deno!"
-[examples]: ./#examples, "Click here for example OpenGraph Images"
+[nberlette]: https://github.com/nberlette "Nicholas Berlette"
+[icns]: https://icns.ml "icns - SVG as a Service"
+[antfu]: https://github.com/antfu "Anthony Fu"
+[icones]: https://icones.js.org "Browse every Iconify Collection with Icones"
+[vercel]: https://og-image.vercel.app "Vercel's OG Image App"
+[iconify]: https://iconify.design "Iconify Project Homepage"
+[kv]: https://developers.cloudflare.com/workers/runtime-apis/kv "Cloudflare KV"
+[svg]: https://w3.org/TR/SVG "SVG Specification from W3.org"
+[resvg]: https://deno.land/x/resvg_wasm "Resvg Wasm"
+[deno]: https://deno.com/deploy "Deno Deploy"
+[deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo "Deploy with Deno!"
+[examples]: ./#examples "Click here for example OpenGraph Images"
 [example-0]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Click%20here%20for%20example%20OpenGraph%20Images/(or%20scroll%20down).png
 [example-1]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png
 [example-2]: https://migo.deno.dev/icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48/Creating%20Dynamic%20Social%20Cover%20Images/By%20Nicholas%20Berlette.png
