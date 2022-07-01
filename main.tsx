@@ -208,14 +208,13 @@ const handle = {
     /**
      * If path parameters have been provided, combine them with any existing query params,
      * for maximum compatibility and flexibility with different requests.
-     * This allows params to be passed in *both* the query string (`.../img.png?param=value`),
-     * as well as the pathname (`param=value;param2=val2`).
      */
-    const allParams = {
-      ...extractParamsObject(params),
-      ...extractParamsObject(url.searchParams.toString()) 
-    };
-    const searchParams = new URLSearchParams(allParams);
+    const searchParams = new URLSearchParams(
+      Object.assign({},
+        extractParamsObject(params),
+        extractParamsObject(url.searchParams.toString())
+      )
+    );
 
     const key: string = fmtkey(req.url, "asset::");
     let data: any = await $kv.get(key, { type: "arrayBuffer" });
@@ -263,7 +262,7 @@ const handle = {
       titleY = ((+iconH) + (+iconY * 2) + +titleFontSize),
       subtitleX = (+width / 2),
       subtitleY = (+titleY + (+subtitleFontSize * 2)),
-    } = allParams;
+    } = Object.fromEntries([...searchParams.entries()]);
 
     let iconContents = "", iconType = "";
 
@@ -377,7 +376,6 @@ const handle = {
         })
     } catch (err) {
       console.error(err)
-      return new Response(data, { headers })
     } finally {
       return new Response(data, { headers, status: 201 }))
     }
