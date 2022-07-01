@@ -1,3 +1,7 @@
+/**
+ * Parts of this file were taken from the aleph.js project utils.ts file:
+ * @see {@link https://github.com/alephjs/aleph.js/blob/main/lib/util.ts}
+ */
 import { Slugger } from "~/deps.ts";
 import { colorHash, formatHex, parseColor, rasterizeSVG } from "~/deps.ts";
 
@@ -8,26 +12,6 @@ export default {
   formatHex,
   parseColor,
   rasterizeSVG,
-  isInt(a: unknown): a is number {
-    return typeof a === "number" && !Number.isNaN(a) && Number.isInteger(a);
-  },
-  isUint(a: unknown): a is number {
-    return this.isInt(a) && a >= 0;
-  },
-  isFilledString(a: unknown): a is string {
-    return typeof a === "string" && a.length > 0;
-  },
-  isFilledArray(a: unknown): a is Array<unknown> {
-    return Array.isArray(a) && a.length > 0;
-  },
-  isPlainObject<T = Record<string, unknown>>(a: unknown): a is T {
-    return a !== null && typeof a === "object" &&
-      Object.getPrototypeOf(a) === Object.prototype;
-  },
-  isLikelyHttpURL(s: string): boolean {
-    const p = s.slice(0, 8).toLowerCase();
-    return p === "https://" || p.slice(0, 7) === "http://";
-  },
   toHex(buffer: ArrayBuffer) {
     const bytes = new Uint8Array(buffer);
     return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -69,18 +53,13 @@ export default {
       units[exp]
     }B`;
   },
-  encode(
-    v: string,
-  ) {
+  encode(v: string) {
     return (/([%][a-f0-9]{2})/ig.test(v) ? v : encodeURIComponent(v));
   },
   decode(v: string) {
     return decodeURIComponent(this.encode(v));
   },
-  formatKey(
-    url: string | URL,
-    prefix = "item::",
-  ) {
+  formatKey(url: string | URL, prefix = "item::") {
     return (prefix + this.sha256(this.encode(new URL(url).toString())));
   },
   slugify(s: string): string {
@@ -96,10 +75,7 @@ export default {
    * Check if an Object's toStringTag is equal to a given value
    * @returns true if
    */
-  toStringTagIs(
-    obj: any,
-    tag: string,
-  ): boolean {
+  toStringTagIs(obj: unknown, tag: string): boolean {
     return (this.toStringTag(obj).toLowerCase() === tag.toLowerCase());
   },
   /**
