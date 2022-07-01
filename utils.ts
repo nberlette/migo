@@ -59,8 +59,8 @@ export default {
   decode(v: string) {
     return decodeURIComponent(this.encode(v));
   },
-  formatKey(url: string | URL, prefix = "item::") {
-    return (prefix + this.sha256(this.encode(new URL(url).toString())));
+  async formatKey(url: string | URL, prefix = "item::") {
+    return (prefix + await this.sha256(this.encode(new URL(url).toString())));
   },
   slugify(s: string): string {
     return Slugger.slug(s);

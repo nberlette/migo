@@ -2,7 +2,7 @@
 Thumbs.db
 .*.log
 .env*
-!.env.project
+.env.me
 !.env.example
 !.env.default*
 .*.save
@@ -11,3 +11,6 @@ Thumbs.db
 *.swp
 .*~
 *~
+!.env.vault
+
+!.env.project

@@ -1,9 +1,17 @@
 <div align="center">
-<h1><a href="https://migo.deno.dev" target="_blank" rel="noopener">migo.deno.dev<img src="https://icns.ml/deno.svg?stroke=black&stroke-width=0.5&color=white&stroke-linejoin=round" width="44" align="left" alt=""></a><!-- -->   <!-- -->   <!-- -->   <!-- --><br clear="all"></h1>
+<h1><a href="https://migo.deno.dev" target="_blank" rel="noopener"><img src="https://icns.ml/deno.svg?stroke=black&stroke-width=0.5&color=white&stroke-linejoin=round" height="24" align="center" alt=""> migo</a><br clear="all"></h1>
 
 _**Generate dynamic OpenGraph images on Deno's Edge Network**_
 
 </div><br />
+
+[![Click here for example OpenGraph Images][example-0]](#examples "Click here for example OpenGraph Images")
+
+---  
+
+<br />
+
+<h2><a href="https://vault.dotenv.org/project/vlt_4c5e0ba364799008839e560b596cf80c308e07e07f99a63a6143710ffd7ee75d/example" title="fork with dotenv-vault" target="_blank" rel="noopener"><img src="https://badge.dotenv.org/fork.svg?r=1" alt="Fork with dotenv-vault" align="right"></a>Features </h2>
 
 - [x] Just-in-time rendering with a globally deployed worker on
       [**Deno Deploy**][deno]
@@ -17,10 +25,6 @@ _**Generate dynamic OpenGraph images on Deno's Edge Network**_
       dimensions, icon, and text.
 - [ ] `TODO` web form for user-friendly image generation
       ([see Vercel's solution][vercel])
-
-<br />
-
-[![Click here for example OpenGraph Images][example-0]](#examples "Click here for example OpenGraph Images")
 
 <br />
 
@@ -163,7 +167,7 @@ MIT © [Nicholas Berlette][nberlette]
 [resvg]: https://deno.land/x/resvg_wasm "Resvg Wasm"
 [deno]: https://deno.com/deploy "Deno Deploy"
 [deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo "Deploy with Deno!"
-[example-0]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Click%20here%20for%20example%20OpenGraph%20Images/(or%20scroll%20down).png
+[example-0]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=999&titleY=425&subtitleFontSize=36/Click%20here%20for%20example%20OpenGraph%20Images/(or%20scroll%20down).png
 [example-1]: https://migo.deno.dev/icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=345&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48/Edge-rendered%20OpenGraph%20Images%20with%20Deno/migo.deno.dev.png
 [example-2]: https://migo.deno.dev/icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48/Creating%20Dynamic%20Social%20Cover%20Images/By%20Nicholas%20Berlette.png
 [example-3]: https://migo.deno.dev/icon=nuxtdotjs;bgColor=112233;iconColor=00DC82;iconStroke=00DC82;iconStrokeWidth=0.55;titleColor=00DC82;subtitleColor=e0e0e0;iconW=300;iconY=50;titleY=460/Nuxt%20ContentWind%20Starter/stackblitz.com%2fedit%2fcontent-wind.png

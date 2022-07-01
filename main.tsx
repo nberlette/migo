@@ -12,6 +12,8 @@ import {
 import utils from "~/utils.ts";
 import Home from "~/home.tsx";
 
+const debug = true;
+
 /**
  * Authenticate and configure Cloudflare KV
  * @see {@link https://gokv.io}
@@ -53,8 +55,9 @@ const handle = {
       ),
     );
 
-    const key: string = utils.formatKey(req.url, "asset::");
+    const key: string = await utils.formatKey(req.url, "asset::");
     let data: any = await $kv.get(key, { type: "arrayBuffer" });
+    if (debug) console.log(key);
 
     if (data != null) {
       return new Response(data, {
