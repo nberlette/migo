@@ -25,7 +25,7 @@ import {
 } from "~/utils.ts";
 
 /**
- * Authenticate and configure DurableKV and KV
+ * Authenticate and configure Cloudflare KV
  * @see {@link https://gokv.io}
  */
 $.config({ token });
@@ -211,14 +211,11 @@ const handle = {
      * This allows params to be passed in *both* the query string (`.../img.png?param=value`),
      * as well as the pathname (`param=value;param2=val2`).
      */
-    const searchParams = new URLSearchParams(
-      // override path params with any overlapping query params
-      Object.assign(
-        {},
-        extractParamsObject(params),
-        extractParamsObject(url.searchParams.toString()),
-      ),
-    );
+    const allParams = {
+      ...extractParamsObject(params),
+      ...extractParamsObject(url.searchParams.toString()) 
+    };
+    const searchParams = new URLSearchParams(allParams);
 
     const key: string = fmtkey(req.url, "asset::");
     let data: any = await $kv.get(key, { type: "arrayBuffer" });
@@ -239,18 +236,18 @@ const handle = {
       width = "1280",
       height = (+width / 2),
       viewBox = `0 0 ${width} ${height}`,
-      bgColor = "#ffffff",
+      bgColor = "#fff",
       pxRatio = "2",
       titleFontSize = "48",
       titleFontFamily = "sans-serif",
       titleFontWeight = "bold",
-      titleColor = "#112233",
+      titleColor = "#123",
       titleStroke = "none",
       titleStrokeWidth = "2",
       subtitleFontSize = "32",
       subtitleFontFamily = "monospace",
       subtitleFontWeight = "normal",
-      subtitleColor = "#334455",
+      subtitleColor = "#345",
       subtitleStroke = "none",
       subtitleStrokeWidth = "2",
       icon = "deno",
@@ -261,12 +258,12 @@ const handle = {
       iconW = "250",
       iconH = iconW,
       iconX = ((+width - +iconW) / 2),
-      iconY = (+iconH / 4),
+      iconY = (+iconH / 3),
       titleX = (+width / 2),
       titleY = ((+iconH) + (+iconY * 2) + +titleFontSize),
       subtitleX = (+width / 2),
       subtitleY = (+titleY + (+subtitleFontSize * 2)),
-    }: Record<string, any> = Object.fromEntries([...searchParams.entries()]);
+    } = allParams;
 
     let iconContents = "", iconType = "";
 
@@ -277,13 +274,11 @@ const handle = {
       }
       iconUrl ??= searchParams.has("iconUrl")
         ? dec(searchParams.get("iconUrl"))
-        : `https://icns.deno.dev/${icon}.svg?fill=currentColor&color=${
+        : `https://icns.ml/${icon}.svg?fill=currentColor&color=${
           iconColor ?? titleColor
         }`;
 
-      iconContents = await fetch(iconUrl).then(async (res) =>
-        res.ok && await res.text()
-      );
+      iconContents = await (await fetch(iconUrl)).text();
 
       if (new URL(iconUrl).pathname.endsWith(".svg")) {
         iconType = "svg";
@@ -293,8 +288,8 @@ const handle = {
         // adjust size of viewBox to account for stroke-width
         if (iconStroke !== "none") {
           iconContents = iconContents.replace(
-            /(?<=viewBox=['"])([^'"]+)(?=['"])/i,
-            (m) => adjustViewBox(+iconStrokeWidth)(m),
+            /(?<=viewBox=['"])([^'"]+)(?=['"])/i, 
+            adjustViewBox(+iconStrokeWidth)
           );
         }
       } else {
@@ -338,8 +333,7 @@ const handle = {
       x="${titleX}"
       y="${titleY}"
     ><tspan>${dec(title)}</tspan></text>
-    ${
-      subtitle
+    ${subtitle
         ? `<text
       id="subtitle"
       text-anchor="middle"
@@ -369,21 +363,24 @@ const handle = {
         cacheTerm[searchParams.has("no-cache") ? "none" : "long"],
     };
 
-    return await $kv
-      .put(key, data, {
-        metadata: {
-          url: url.toString(),
-          conn: connInfo,
-          date: new Date().toJSON(),
-        },
-        // set cacheTtl (unless no-cache is passed)
-        // cacheTtl: searchParams.has('no-cache') ? 60 : TTL_1M,
-        expirationTtl: TTL_1Y,
-      })
-      .then(() => new Response(data, { headers, status: 201 }))
-      .catch((err: unknown) => (
-        console.error(err), new Response(data, { headers, status: 200 })
-      ));
+    try {
+      await $kv
+        .put(key, data, {
+          metadata: {
+            url: url.toString(),
+            conn: connInfo,
+            date: new Date().toJSON(),
+          },
+          // set cacheTtl (unless no-cache is passed)
+          // cacheTtl: searchParams.has('no-cache') ? 60 : TTL_1M,
+          expirationTtl: TTL_1Y,
+        })
+    } catch (err) {
+      console.error(err)
+      return new Response(data, { headers })
+    } finally {
+      return new Response(data, { headers, status: 201 }))
+    }
   },
   home(req: Request, connInfo: ConnInfo, params: PathParams) {
     const commentClsx =
@@ -557,7 +554,7 @@ const handle = {
             </p>
             <footer class="prose text-center pt-2 border-t border-gray-200 dark:!border-blue-gray-700">
               <Link
-                url="https://github.com/nberlette"
+                url="https://github.com/nberlette/migo"
                 title="View Nicholas Berlette's GitHub Profile"
               >
                 <img
