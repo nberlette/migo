@@ -1,4 +1,4 @@
-export * from "sift";
+export { h, serve } from "sift";
 export { formatHex, parse as parseColor } from "culori";
 export { default as colorHash } from "colorhash";
 export { html } from "htm";

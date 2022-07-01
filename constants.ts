@@ -1,4 +1,5 @@
-import { enc } from "~/utils.ts";
+import utils from "~/utils.ts";
+const enc = utils.encode;
 
 export const namespace = Deno.env.get("GOKV_NAMESPACE") || "migo";
 export const token = Deno.env.get("GOKV_TOKEN") || null;

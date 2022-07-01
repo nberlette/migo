@@ -45,8 +45,8 @@ format yet, so requests without an `.{svg,png}` extension are redirected to
 
 Icons are embedded from [**icns**][icns], another Deno-powered project of mine.
 This means direct access to **over 100,000 icons**, and **millions of color
-combinations**. A great tool to browse the available icons and make a selection is
-[**icones**][icones] by [Anthony Fu][antfu].
+combinations**. A great tool to browse the available icons and make a selection
+is [**icones**][icones] by [Anthony Fu][antfu].
 
 To add an icon to an OG image, use the slug (in Iconify format) for the `icon`
 param, like so:
