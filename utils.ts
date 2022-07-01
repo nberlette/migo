@@ -84,5 +84,8 @@ export function createSrcSet(url: string, sizes = [1280, 640, 480]): string {
  * @param s the stroke width to use as an adjustment factor
  * @returns replacer function to formatted viewBox value using `str.replace`
  */
-export const adjustViewBox = (s: number | string) => (m: string) => 
-  m.split(/[\s ]+/g, 4).map((v, i) => i < 2 ? (+v - (+s * 2)) : (+v + (+s * 4))).join(" ");
+export const adjustViewBox = (s: number | string) =>
+  (m: string) =>
+    m.split(/[\s ]+/g, 4).map((v, i) =>
+      i < 2 ? (+v - (+s * 2)) : (+v + (+s * 4))
+    ).join(" ");
