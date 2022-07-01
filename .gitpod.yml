@@ -1,7 +1,7 @@
 image: nberlette/gitpod-enhanced:latest
 
 tasks:
-  - # ensure deno is installed before proceeding
+  - before: [ -n "$DOTENV_ME" ] && [[ -e ".env.value" || -n "$DOTENV_VAULT" ]] && npx -y dotenv-vault pull;
     init: |
       export DENO_INSTALL_ROOT="$HOME/.deno/bin"
       export PATH="$DENO_INSTALL_ROOT:$PATH"
