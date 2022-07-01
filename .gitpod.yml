@@ -5,7 +5,7 @@ tasks:
     before: |
       if [ -n "$DOTENV_ME" ]; then
         if [ -e .env.vault ] || [ -n "$DOTENV_VAULT" ]; then
-          npx -y dotenv-vault pull
+          npx -y dotenv-vault@latest pull
         fi
       fi
     init: |
