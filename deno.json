@@ -7,43 +7,50 @@
       "dom.iterable",
       "dom.asynciterable",
       "dom.extras",
-      "deno.ns"
+      "deno.ns",
+      "deno.unstable"
     ],
     "types": [
-      "./migo.d.ts"
-    ]
+      "./types.d.ts"
+    ],
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "jsxImportSource": "https://esm.sh/preact@10.10.0",
+    "strictNullChecks": false
   },
   "fmt": {
     "files": {
       "exclude": [
         "static",
-        ".vscode"
+        ".vscode",
+        ".gitpod.yml",
+        ".git*",
+        ".env*"
       ]
-    },
-    "options": {
-      "indentWidth": 2,
-      "lineWidth": 80,
-      "proseWrap": "always",
-      "singleQuote": false,
-      "useTabs": false
     }
   },
   "lint": {
     "files": {
       "exclude": [
         "static",
-        "test"
+        "test",
+        ".vscode",
+        "README.md",
+        "LICENSE",
+        "./deps.ts"
       ]
     },
     "rules": {
       "exclude": [
-        "no-explicit-any"
+        "no-explicit-any",
+        "import-prefix-missing"
       ]
     }
   },
   "tasks": {
-    "dev": "deno run -A --unstable main.tsx --watch",
-    "start": "deno run -A --unstable main.tsx",
+    "dev": "deno run -A --unstable --watch=. main.tsx",
+    "preview": "deno run --allow-net --allow-env main.tsx",
     "test": "deno test -A --unstable"
   }
 }
