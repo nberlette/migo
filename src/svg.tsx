@@ -9,12 +9,12 @@
 
 import {
   colorHash,
+  decode,
   formatHex,
-  h,
   Fragment,
+  h,
   parseColor,
   renderToString,
-  decode,
 } from "~/deps.ts";
 import { Params } from "~/src/utils.ts";
 import { CDN_URL, defaultParams, FALLBACK_ICON_URL } from "~/src/constants.ts";

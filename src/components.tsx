@@ -1,7 +1,7 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
 import { createSrcSet, slugify } from "~/src/utils.ts";
-import { type ComponentChildren, Fragment, h, decode, is } from "~/deps.ts";
+import { type ComponentChildren, decode, Fragment, h, is } from "~/deps.ts";
 import { meta, paramList } from "~/src/constants.ts";
 
 export const Footer = ({ ...props }) => (

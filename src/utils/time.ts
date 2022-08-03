@@ -1,4 +1,4 @@
-import log from "./log.ts";
+import { log } from "~/deps.ts";
 
 /**
  * Maps human-readable time measurement names to their numeric values.

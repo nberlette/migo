@@ -2,19 +2,19 @@
 /** @jsx h */
 import {
   type ConnInfo,
+  decode,
+  formatHex,
   GOKV,
   h,
   html,
-  presetWind,
-  type Routes,
-  serve,
-  UnoCSS,
-  decode,
-  formatHex,
   log,
   lowerCase,
   parseColor,
+  presetWind,
   rasterizeSVG,
+  type Routes,
+  serve,
+  UnoCSS,
 } from "~/deps.ts";
 
 import {
@@ -28,12 +28,7 @@ import {
 
 import { Home } from "~/src/home.tsx";
 
-import {
-  formatKey,
-  generateSVG,
-  newResponse,
-  Params,
-} from "~/src/utils.ts";
+import { formatKey, generateSVG, newResponse, Params } from "~/src/utils.ts";
 
 import { shortcuts } from "src/constants.ts";
 
