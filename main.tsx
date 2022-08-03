@@ -22,6 +22,7 @@ import {
   FAVICON_URL,
   links,
   meta,
+  shortcuts,
   styles,
   TTL_1Y,
 } from "~/src/constants.ts";
@@ -29,8 +30,6 @@ import {
 import { Home } from "~/src/home.tsx";
 
 import { formatKey, generateSVG, newResponse, Params } from "~/src/utils.ts";
-
-import { shortcuts } from "src/constants.ts";
 
 import { config as dotenv } from "std/dotenv/mod.ts";
 
@@ -41,11 +40,12 @@ await dotenv({/* dotenv options */}).catch(log.error);
  * @see {@link https://gokv.io}
  */
 const namespace = Deno.env.get("GOKV_NAMESPACE") ?? "migo";
+
 try {
   const token = Deno.env.get("GOKV_TOKEN") ?? null;
   GOKV.config({ token });
-} catch (e) {
-  throw new Error(`Failed to configure GOKV! ${e.toString()}`);
+} catch (cause) {
+  throw new Error(`Failed to configure GOKV!`, { cause });
 }
 
 export const $kv = GOKV.KV({ namespace: `${namespace}-kv` });
@@ -65,8 +65,8 @@ html.use(UnoCSS({
   shortcuts,
 }));
 
-console.log(
-  "\n%c%s\n",
+console.info(
+  "%c%s\n",
   "font-weight:bold;color:#8dddff;",
   String.fromCodePoint(0x24dc, 0x20, 0x24d8, 0x20, 0x24d6, 0x20, 0x24de) + "  ",
 );
@@ -79,7 +79,7 @@ const handle = {
     pathParams: Record<string, string>,
   ) {
     const url = new URL(req.url);
-    const { type } = pathParams;
+    const type: string = pathParams?.type ?? "png";
 
     let contentType = "image/svg+xml;charset=utf-8";
     if (type === "png") {
@@ -159,7 +159,7 @@ const handle = {
     url.search = "?" + params.toString();
     const key: string = await formatKey(params.toString(), "asset::");
 
-    console.log(
+    log.debug(
       "[SHA-256 KEY]:\n  %s\n\n[REQUEST PARAMS]:\n  %s\n",
       key,
       params.toString(),

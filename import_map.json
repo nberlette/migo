@@ -30,8 +30,8 @@
     "aleph/server": "https://deno.land/x/aleph/server/mod.ts",
     "aleph/": "https://deno.land/x/aleph@1.0.0-alpha.90/",
     "@unocss/": "https://deno.land/x/aleph@1.0.0-alpha.90/lib/@unocss/",
-    "911": "https://deno.land/x/911@0.0.3/mod.ts",
-    "911/": "https://deno.land/x/911@0.0.3/src/"
+    "911": "https://deno.land/x/911@0.0.5/mod.ts",
+    "911/": "https://deno.land/x/911@0.0.5/src/"
   },
   "scopes": {}
 }
