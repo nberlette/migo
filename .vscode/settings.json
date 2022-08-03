@@ -1,5 +1,40 @@
 {
   "deno.enable": true,
   "deno.unstable": true,
-  "deno.codeLens.test": true
+  "deno.codeLens.test": true,
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": true,
+    "https://x.nest.land": true,
+    "https://crux.land": true,
+    "https://x.lcas.dev": true
+  },
+  "git.enableCommitSigning": true,
+  "editor.minimap.enabled": false,
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": ["/usr/local/bin/bash", "/home/linuxbrew/.linuxbrew/bin/bash", "/usr/bin/bash"],
+      "icon": "debug-breakpoint-function"
+    },
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#65c89b",
+    "activityBar.activeBorder": "#945bc4",
+    "activityBar.background": "#65c89b",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#945bc4",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "sash.hoverBorder": "#65c89b",
+    "statusBar.background": "#42b883",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#359268",
+    "statusBarItem.remoteBackground": "#42b883",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#42b883",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#42b88399",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.remoteColor": "#42b883"
 }

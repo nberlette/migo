@@ -1,24 +1,38 @@
 image: nberlette/gitpod-enhanced:latest
 
 tasks:
-  - # pull .env from dotenv-vault
+  - # WARNING: remove this if you share your workspaces!
     before: |
-      if [ -n "$DOTENV_ME" ]; then
-        if [ -e .env.vault ] || [ -n "$DOTENV_VAULT" ]; then
-          npx -y dotenv-vault@latest pull
-        fi
+      cd "$GITPOD_REPO_ROOT" || exit $?;
+      [ -n "$DOTENV_VAULT" ] && [ ! -e .env.vault ] && 
+        echo "DOTENV_VAULT=$DOTENV_VAULT" > .env.vault;
+      [ -n "$DOTENV_ME" ] && [ ! -e .env.me ] &&
+        echo "DOTENV_ME=$DOTENV_ME" > .env.me;
+      if [ -e .env.me ] && [ -e .env.vault ] && [ ! -e .env ]; then
+        which dotenv-vault &>/dev/null && 
+          dotenv-vault pull || npx -y dotenv-vault@latest pull;
+        # expose the .env variables to current environment
+        [ -e .env ] && { set -a; source .env; set +a; }
       fi
+    # make sure we have deno installed
     init: |
       export DENO_INSTALL_ROOT="$HOME/.deno/bin"
       export PATH="$DENO_INSTALL_ROOT:$PATH"
-      which deno &>/dev/null || brew install deno &>/dev/null;
+      which deno &>/dev/null || brew install deno --quiet --overwrite
       gp sync-done listo
-  - # proceed if ready
+  - # proceed once we are ready
     init: gp sync-await listo
-    command: |
-      deno cache
-      deno fmt
-      deno lint
+    command: deno task dev 2>&1 || deno task
+
+ports:
+  - name: "Develop"
+    port: 8000
+    visibility: private
+    onOpen: open-preview
+  - name: "Preview"
+    port: 8080
+    visibility: public
+    onOpen: notify
 
 github:
   prebuilds:
