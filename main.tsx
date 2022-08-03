@@ -195,6 +195,7 @@ const handle = {
   /** home page request handler */
   home: () =>
     html({
+      colorScheme: "auto",
       lang: "en",
       title: meta.title,
       meta: meta as any,
