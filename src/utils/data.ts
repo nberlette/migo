@@ -1,8 +1,7 @@
-import { cacheTerm } from "~/src/constants.ts";
-
+import { cacheTerm, etag } from "~/src/constants.ts";
+export { etag }
 export {
   computeHash,
-  etag,
   groupBy,
   json,
   sha1,
