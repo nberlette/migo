@@ -2,7 +2,7 @@ import { cacheTerm } from "~/src/constants.ts";
 
 export {
   computeHash,
-  eTag as etag,
+  etag,
   groupBy,
   json,
   sha1,
