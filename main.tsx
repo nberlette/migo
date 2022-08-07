@@ -7,7 +7,6 @@ import {
   GOKV,
   h,
   html,
-  log,
   lowerCase,
   parseColor,
   presetWind,
@@ -15,7 +14,7 @@ import {
   type Routes,
   serve,
   UnoCSS,
-} from "~/deps.ts";
+} from "./deps.ts";
 
 import {
   defaultParams,
@@ -25,16 +24,16 @@ import {
   shortcuts,
   styles,
   TTL_1Y,
-} from "~/src/constants.ts";
-
-import { Home } from "~/src/home.tsx";
-
-import { formatKey, generateSVG, newResponse, Params } from "~/src/utils.ts";
-
+} from "./src/constants.ts";
+import { Home } from "./src/home.tsx";
+import { formatKey, generateSVG, newResponse, Params } from "./src/utils.ts";
 import { config as dotenv } from "std/dotenv/mod.ts";
 
-await dotenv({/* dotenv options */}).catch(log.error);
-
+try {
+  await dotenv({
+    allowEmptyValues: true,
+  });
+} catch { /* noop */ }
 /**
  * Authenticate and configure Cloudflare KV
  * @see {@link https://gokv.io}
@@ -49,16 +48,6 @@ try {
 }
 
 export const $kv = GOKV.KV({ namespace: `${namespace}-kv` });
-export const $fs = GOKV.Uploader({
-  acceptTypes: [
-    "image/png",
-    "image/jpeg",
-    "image/avif",
-    "image/webp",
-    "image/svg+xml",
-  ],
-  limit: 1024 * 1024 * 10,
-});
 
 html.use(UnoCSS({
   presets: [presetWind()] as any,
@@ -159,7 +148,7 @@ const handle = {
     url.search = "?" + params.toString();
     const key: string = await formatKey(params.toString(), "asset::");
 
-    log.debug(
+    console.debug(
       "[SHA-256 KEY]:\n  %s\n\n[REQUEST PARAMS]:\n  %s\n",
       key,
       params.toString(),
@@ -188,7 +177,7 @@ const handle = {
       });
       status = 201;
     } catch (err) {
-      log.error(err);
+      console.error(err);
     }
     return newResponse(data, { contentType, status });
   },
@@ -206,9 +195,14 @@ const handle = {
   favicon: async () =>
     newResponse(await fetch(FAVICON_URL).then((r) => r.arrayBuffer())),
   robotsTxt: () =>
-    newResponse(`User-agent: *\nDisallow:\n`, {
-      contentType: "text/plain",
-    }),
+    newResponse(
+      `User-agent: *
+Disallow: *.png,*.svg
+`,
+      {
+        contentType: "text/plain",
+      },
+    ),
 };
 
 serve({

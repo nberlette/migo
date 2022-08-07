@@ -1,6 +1,6 @@
 /** @jsx h */
-import { h } from "~/deps.ts";
-import { site } from "~/src/constants.ts";
+import { h } from "../deps.ts";
+import { site } from "./constants.ts";
 import {
   DeployButton,
   ExampleImage,
@@ -10,7 +10,7 @@ import {
   Link,
   ParamList,
   RouteSchema,
-} from "~/src/components.tsx";
+} from "./components.tsx";
 
 export const Home = () => {
   return (
