@@ -18,8 +18,32 @@ export { default as colorHash } from "colorhash";
 
 export { render as rasterizeSVG } from "resvg";
 
-export { assert as isAssert, eTag as etag } from "911";
-
-export * from "911";
+export {
+  camelCase,
+  computeHash,
+  decode,
+  encode,
+  eTag as etag,
+  groupBy,
+  isArray,
+  isObject,
+  json,
+  kebabCase,
+  lowerCase,
+  sha1,
+  sha256,
+  snakeCase,
+  sortBy,
+  titleCase,
+  toHex,
+  toStringTag,
+  upperCase,
+  utf8TextDecoder,
+  utf8TextEncoder,
+} from "911";
 
 export { default as is } from "is";
+
+import { Logger } from "911";
+
+export const log = new Logger();

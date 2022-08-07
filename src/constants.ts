@@ -1,4 +1,4 @@
-import { encode, portal } from "~/src/utils.ts";
+import { encode, portal } from "./utils.ts";
 
 export const DEBUG = (+Deno.env.get("DEBUG") === 1);
 
@@ -21,6 +21,7 @@ export const TTL_1D = portal(1, "day");
 export const TTL_1W = portal(1, "week");
 export const TTL_1M = portal(1, "month");
 export const TTL_1Y = portal(1, "year");
+
 /**
  * Cache-Control header values for long-term, short-term, and no-cache.
  */
@@ -178,6 +179,7 @@ export const paramList = [
   ["titleColor", "#112233", "// text color"],
   ["titleStroke", "none", "// stroke color"],
   ["titleStrokeWidth", "0", "// stroke width"],
+  ["titleTextAnchor", "middle", "// text-anchor"],
   ["// subtitle (second line of text)"],
   ["subtitleX", "640", "// (width / 2)"],
   ["subtitleY", "530", "// (titleY + (subtitleFontSize * 2.5))"],
@@ -187,6 +189,7 @@ export const paramList = [
   ["subtitleColor", "#334455", "// text color"],
   ["subtitleStroke", "none", "// stroke color"],
   ["subtitleStrokeWidth", "0", "// stroke width"],
+  ["subtitleTextAnchor", "middle", "// text-anchor"],
 ];
 
 /**
