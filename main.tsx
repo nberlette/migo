@@ -1,276 +1,217 @@
+/// <reference no-default-lib="true" />
 /** @jsx h */
-import { $, h, html, serve } from "~/deps.ts";
 import {
-  cacheTerm,
+  type ConnInfo,
+  decode,
+  formatHex,
+  GOKV,
+  h,
+  html,
+  lowerCase,
+  parseColor,
+  presetWind,
+  rasterizeSVG,
+  type Routes,
+  serve,
+  UnoCSS,
+} from "./deps.ts";
+
+import {
+  defaultParams,
+  FAVICON_URL,
   links,
   meta,
-  namespace,
-  siteMeta,
-  token,
+  shortcuts,
+  styles,
   TTL_1Y,
-} from "~/constants.ts";
-import utils from "~/utils.ts";
-import Home from "~/home.tsx";
+} from "./src/constants.ts";
+import { Home } from "./src/home.tsx";
+import { formatKey, generateSVG, newResponse, Params } from "./src/utils.ts";
+import { config as dotenv } from "std/dotenv/mod.ts";
 
-const debug = true;
-
+try {
+  await dotenv({
+    allowEmptyValues: true,
+  });
+} catch { /* noop */ }
 /**
  * Authenticate and configure Cloudflare KV
  * @see {@link https://gokv.io}
  */
-$.config({ token });
-const $kv = $.KV({ namespace });
+const namespace = Deno.env.get("GOKV_NAMESPACE") ?? "migo";
 
-/**
- * Route handlers
- */
+try {
+  const token = Deno.env.get("GOKV_TOKEN") ?? null;
+  GOKV.config({ token });
+} catch (cause) {
+  throw new Error(`Failed to configure GOKV!`, { cause });
+}
+
+export const $kv = GOKV.KV({ namespace: `${namespace}-kv` });
+
+html.use(UnoCSS({
+  presets: [presetWind()] as any,
+  shortcuts,
+}));
+
+console.info(
+  "%c%s\n",
+  "font-weight:bold;color:#8dddff;",
+  String.fromCodePoint(0x24dc, 0x20, 0x24d8, 0x20, 0x24d6, 0x20, 0x24de) + "  ",
+);
+
 const handle = {
-  async image(req: Request, connInfo: ConnInfo, {
-    title,
-    subtitle,
-    params,
-    type,
-  }: PathParams) {
+  /** image request handler */
+  async image(
+    req: Request,
+    connInfo: ConnInfo,
+    pathParams: Record<string, string>,
+  ) {
     const url = new URL(req.url);
-    let contentType = "image/svg+xml;charset=utf-8";
+    const type: string = pathParams?.type ?? "png";
 
+    let contentType = "image/svg+xml;charset=utf-8";
+    if (type === "png") {
+      contentType = "image/png;charset=utf-8";
+    }
     if (!["png", "svg"].includes(type)) {
       const newUrl = new URL(url);
       newUrl.pathname = newUrl.pathname + ".png";
       return Response.redirect(newUrl, 301);
     }
-    if (type === "png") {
-      contentType = "image/png;charset=utf-8";
-    }
 
+    // janky way to fix some routing issues
+    if (pathParams.params == null) {
+      if (
+        pathParams.title != null && Params.pattern.params.test(pathParams.title)
+      ) {
+        pathParams.params = pathParams.title;
+        if (pathParams.subtitle != null) {
+          pathParams.title = pathParams.subtitle;
+          delete pathParams.subtitle;
+        } else {
+          delete pathParams.title;
+        }
+      } else if (Params.pattern.params.test(pathParams.subtitle)) {
+        pathParams.params = pathParams.subtitle;
+        delete pathParams.subtitle;
+      } else {
+        pathParams.params = pathParams.title;
+      }
+    }
     /**
      * If path parameters have been provided, combine them with any existing query params,
      * for maximum compatibility and flexibility with different requests.
      */
-    const searchParams = new URLSearchParams(
-      Object.assign(
-        {},
-        utils.extractParamsObject(params),
-        utils.extractParamsObject(url.searchParams.toString()),
-      ),
-    );
-
-    const key: string = await utils.formatKey(req.url, "asset::");
-    let data: any = await $kv.get(key, { type: "arrayBuffer" });
-    if (debug) console.log(key);
-
-    if (data != null) {
-      return new Response(data, {
-        headers: {
-          "access-control-allow-origin": "*",
-          "content-type": contentType,
-          "content-length": `${data.byteLength}`,
-          "cache-control":
-            cacheTerm[searchParams.has("no-cache") ? "none" : "long"],
-        },
-      });
-    }
-
-    let {
-      width = "1280",
-      height = (+width / 2),
-      viewBox = `0 0 ${width} ${height}`,
-      bgColor = "#fff",
-      pxRatio = "2",
-      titleFontSize = "48",
-      titleFontFamily = "sans-serif",
-      titleFontWeight = "bold",
-      titleColor = "#123",
-      titleStroke = "none",
-      titleStrokeWidth = "2",
-      subtitleFontSize = "32",
-      subtitleFontFamily = "monospace",
-      subtitleFontWeight = "normal",
-      subtitleColor = "#345",
-      subtitleStroke = "none",
-      subtitleStrokeWidth = "2",
-      icon = "deno",
-      iconUrl = `https://icns.ml/${icon}.svg`,
-      iconColor = null,
-      iconStroke = "none",
-      iconStrokeWidth = "2",
-      iconW = "250",
-      iconH = iconW,
-      iconX = ((+width - +iconW) / 2),
-      iconY = (+iconH / 3),
-      titleX = (+width / 2),
-      titleY = ((+iconH) + (+iconY * 2) + +titleFontSize),
-      subtitleX = (+width / 2),
-      subtitleY = (+titleY + (+subtitleFontSize * 2)),
-    } = Object.fromEntries([...searchParams.entries()]);
-
-    let iconContents = "", iconType = "";
-
-    if (icon != null) {
-      icon = utils.decode(icon ?? "deno");
-      if (iconColor === "hash") {
-        iconColor = new utils.colorHash().hex(title);
-      }
-      iconUrl ??= searchParams.has("iconUrl")
-        ? utils.decode(searchParams.get("iconUrl"))
-        : `https://icns.ml/${icon}.svg?fill=currentColor&color=${
-          iconColor ?? titleColor
-        }`;
-
-      iconContents = await (await fetch(iconUrl)).text();
-
-      if (new URL(iconUrl).pathname.endsWith(".svg")) {
-        iconType = "svg";
-        iconContents = iconContents
-          .replace(/^<svg/i, '<symbol id="icon"')
-          .replace(/<\/svg>/i, "</symbol>");
-        // adjust size of viewBox to account for stroke-width
-        if (iconStroke !== "none") {
-          iconContents = iconContents.replace(
-            /(?<=viewBox=['"])([^'"]+)(?=['"])/i,
-            utils.adjustViewBox(+iconStrokeWidth),
-          );
-        }
-      } else {
-        iconType = "other";
-      }
-    }
-
-    data = `<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="${(+width * +pxRatio)}"
-  height="${(+height * +pxRatio)}"
-  viewBox="${viewBox}"
-  role="img"
->
-  <title>${utils.decode(title)}</title>
-  <rect fill="${
-      utils.formatHex(utils.parseColor(bgColor))
-    }" x="0" y="0" width="${width}" height="${height}" />
-  ${iconType === "svg" ? `<defs>${iconContents}</defs>` : ""}
-  <g stroke="none" fill="none" fill-rule="evenodd">
-    ${
-      (searchParams.has("noIcon") || icon === "false")
-        ? ""
-        : (iconType === "svg"
-          ? `<use href="#icon" color="${
-            utils.formatHex(utils.parseColor(iconColor))
-          }" stroke="${utils.formatHex(utils.parseColor(iconStroke))}"
-          stroke-width="${iconStrokeWidth ?? 0}"`
-          : `<image href="${iconUrl}"`) +
-          ` width="${iconW}" height="${iconH}" x="${iconX}" y="${iconY}" />`
-    }
-    <text
-      id="title"
-      text-anchor="middle"
-      font-family="${titleFontFamily}"
-      font-size="${titleFontSize}"
-      font-weight="${titleFontWeight}"
-      fill="${utils.formatHex(utils.parseColor(titleColor))}"
-      stroke="${utils.formatHex(utils.parseColor(titleStroke))}"
-      stroke-width="${titleStrokeWidth}"
-      x="${titleX}"
-      y="${titleY}"
-    ><tspan>${utils.decode(title)}</tspan></text>
-    ${
-      subtitle
-        ? `<text
-      id="subtitle"
-      text-anchor="middle"
-      font-family="${subtitleFontFamily}"
-      font-size="${subtitleFontSize}"
-      font-weight="${subtitleFontWeight}"
-      fill="${utils.formatHex(utils.parseColor(subtitleColor))}"
-      stroke="${utils.formatHex(utils.parseColor(subtitleStroke))}"
-      stroke-width="${subtitleStrokeWidth}"
-      x="${subtitleX}"
-      y="${subtitleY}"
-    ><tspan>${utils.decode(subtitle)}</tspan></text>`
-        : ""
-    }
-  </g>
-</svg>`;
-
-    if (type === "png") {
-      data = utils.rasterizeSVG(data);
-    }
-
-    const headers = {
-      "access-control-allow-origin": "*",
-      "content-type": contentType,
-      "content-length": data.length,
-      "cache-control":
-        cacheTerm[searchParams.has("no-cache") ? "none" : "long"],
+    const pathParameters = new Params(decode(pathParams?.params));
+    const searchParams = new Params(url.searchParams.toString());
+    const mergedParams = {
+      ...defaultParams,
+      ...pathParams,
+      ...pathParameters.toJSON(),
+      ...searchParams.toJSON(),
     };
 
-    let status = 200;
+    const params = new Params(mergedParams);
+
+    for (const key of Object.keys(mergedParams)) {
+      const val = decode(mergedParams[key]);
+      if (Params.pattern.params.test(val)) {
+        Params.parse(val).forEach((v, k) => {
+          v = decode(v)?.trim?.() ?? "";
+          if (lowerCase(k).endsWith("color")) {
+            params.set(k, formatHex(parseColor(decode(v))));
+          } else {
+            params.set(k, v);
+          }
+        });
+      } else {
+        if (lowerCase(key).endsWith("color")) {
+          params.set(key, formatHex(parseColor(decode(val))));
+        } else {
+          params.set(key, val);
+        }
+      }
+    }
+
+    for (const key of url.searchParams.keys()) {
+      const val = decode(url.searchParams.get(key));
+      if (lowerCase(key).endsWith("color")) {
+        params.set(key, formatHex(parseColor(decode(val))));
+      } else {
+        params.set(key, val);
+      }
+    }
+
+    // params.distinct();
+
+    url.search = "?" + params.toString();
+    const key: string = await formatKey(params.toString(), "asset::");
+
+    console.debug(
+      "[SHA-256 KEY]:\n  %s\n\n[REQUEST PARAMS]:\n  %s\n",
+      key,
+      params.toString(),
+    );
+
+    let data: any, status = 200;
+
+    if ((data = await $kv.get(key, { type: "arrayBuffer" }))) {
+      return await newResponse(data, { params, contentType, status });
+    }
+    status = 201;
+    data = await generateSVG({ params, type });
+
+    if (type === "png") {
+      data = rasterizeSVG(data);
+    }
 
     try {
-      await $kv
-        .put(key, data, {
-          metadata: {
-            url: url.toString(),
-            conn: connInfo,
-            date: new Date().toJSON(),
-          },
-          // set cacheTtl (unless no-cache is passed)
-          // cacheTtl: searchParams.has('no-cache') ? 60 : TTL_1M,
-          expirationTtl: TTL_1Y,
-        });
+      await $kv.put(key, data, {
+        metadata: {
+          url: url.toString(),
+          conn: connInfo,
+          date: new Date().toJSON(),
+        },
+        expirationTtl: TTL_1Y,
+      });
       status = 201;
     } catch (err) {
       console.error(err);
     }
-    return new Response(data, { headers, status });
+    return newResponse(data, { contentType, status });
   },
-  home(req: Request, connInfo: ConnInfo, params: PathParams) {
-    // render jsx homepage
-    return html({
+  /** home page request handler */
+  home: () =>
+    html({
+      colorScheme: "auto",
       lang: "en",
-      title: siteMeta.siteTitle,
-      meta,
+      title: meta.title,
+      meta: meta as any,
       links,
-      styles: [],
+      styles,
       body: <Home />,
-    });
-  },
-  /**
-   * @param req Request
-   * @param connInfo Connect Information
-   * @param params URL Parameters
-   * @returns Response
-   */
-  async favicon(req: Request, connInfo: ConnInfo, params: PathParams) {
-    const res = await fetch(
-      "https://icns.ml/mdi:alpha-m-circle-outline:dynamic.svg",
-    );
-    const favicon = await res.arrayBuffer();
-    return new Response(favicon, {
-      headers: {
-        "access-control-allow-origin": "*",
-        "content-type": "image/svg+xml;charset=utf-8",
-        "content-length": `${favicon.byteLength}`,
-        "cache-control": cacheTerm.long,
+    }),
+  favicon: async () =>
+    newResponse(await fetch(FAVICON_URL).then((r) => r.arrayBuffer())),
+  robotsTxt: () =>
+    newResponse(
+      `User-agent: *
+Disallow: *.png,*.svg
+`,
+      {
+        contentType: "text/plain",
       },
-    } as ResponseInit);
-  },
-  robotsTxt(req: Request, connInfo: ConnInfo, params: PathParams) {
-    return new Response(`User-agent: *\nDisallow:\n`, {
-      headers: {
-        "access-control-allow-origin": "*",
-        "content-type": "text/plain;charset=utf-8",
-      },
-    });
-  },
+    ),
 };
 
 serve({
   "/": handle.home,
   "/favicon.:ext(ico|svg)": handle.favicon,
   "/robots.txt": handle.robotsTxt,
+  "/:title.:type(png|svg)": handle.image,
+  "/:title/:subtitle.:type(png|svg)": handle.image,
   "/:params/:title/:subtitle([^]+?).:type(png|svg)": handle.image,
-  "/:params/:title([^]+?).:type(png|svg)": handle.image,
-  "/:title([^]+?).:type(png|svg)": handle.image,
-  "/:wheresmyextension([^]+?)": handle.image,
+  "/:fallback([^]+?)": handle.image,
   404: handle.home,
 } as Routes);

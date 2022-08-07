@@ -1,5 +1,21 @@
 {
   "deno.enable": true,
   "deno.unstable": true,
-  "deno.codeLens.test": true
+  "deno.codeLens.test": true,
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": true,
+    "https://x.nest.land": true,
+    "https://crux.land": true,
+    "https://x.lcas.dev": true
+  },
+  "git.enableCommitSigning": true,
+  "editor.minimap.enabled": false,
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": ["/usr/local/bin/bash", "/home/linuxbrew/.linuxbrew/bin/bash", "/usr/bin/bash"],
+      "icon": "debug-breakpoint-function"
+    },
+  },
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "peacock.remoteColor": "#42b883"
 }

@@ -7,7 +7,7 @@ _**Generate dynamic OpenGraph images on Deno's Edge Network**_
 
 [![Click here for example OpenGraph Images][example-0]](#examples "Click here for example OpenGraph Images")
 
----  
+---
 
 <br />
 
