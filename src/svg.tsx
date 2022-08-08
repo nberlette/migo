@@ -68,7 +68,9 @@ export async function generateSVG({
   let iconContents: any = "",
     iconType: string | null = "",
     icon: string | null = "twemoji:letter-m",
-    iconColor = params.has("iconColor") ? params.get("iconColor") : "currentColor";
+    iconColor = params.has("iconColor")
+      ? params.get("iconColor")
+      : "currentColor";
   let iconUrl = createIconUrl(icon);
 
   const mergedParams: AllProps<string> = {

@@ -198,7 +198,17 @@ export const paramList = [
  */
 export const shortcuts = {
   "btn-large":
-    "bg-black text-white inline-flex flex-row flex-nowrap gap-x-3 place-items-center py-1.5 sm:py-2 md:py-2.5 px-4 sm:px-5 md:px-6 mt-6 mb-5 sm:mt-7 sm:mb-6 md:mt-10 md:mb-9 rounded-full ring-2 ring-blue-gray-900 dark:ring-blue-gray-50 hover:!bg-white hover:!text-blue-gray-900 dark:hover:!ring-white shadow-sm hover:shadow-xl hover:animate-pulse-alt !animate-duration-2s transition-all duration-500 ease-in-out underline-black underline-opacity-0 hover:!underline-opacity-50 underline underline-offset-1 underline-1 underline-dashed tracking-tight",
+    "bg-black text-white inline-flex flex-row flex-nowrap gap-x-3 place-items-center py-1.5 sm:py-2 md:py-2.5 px-4 sm:px-5 md:px-6 mt-6 mb-5 sm:mt-7 sm:mb-6 md:mt-10 md:mb-9 rounded-full ring-2 ring-blue-gray-900 dark:ring-blue-gray-50 hover:!bg-white hover:!text-blue-gray-900 dark:hover:!ring-white shadow-sm hover:shadow-xl hover:animate-pulse-alt !animate-duration-2s transition-all duration-500 ease-in-out tracking-tight whitespace-nowrap break-normal",
+  "btn-icon":
+    "filter -invert-[1.0] w-4 h-4 sm:w-5 sm:h-5 md:w-5.5 md:h-5.5 lg:w-6 lg:h-6",
+  "btn-colorscheme":
+    "cursor-pointer dark:!text-white inline-block overflow-hidden bg-transparent border-none",
+  "app-header":
+    "text-center py-2 my-4 border-b border-gray-200 dark:!border-gray-700 select-none",
+  "app-title":
+    "text-7xl font-thin tracking-tighter text-left text-black dark:text-white -mb-3",
+  "btn-wrapper":
+    "my-1.5 md:my-2 text-base md:text-lg text-center place-items-center justify-center align-middle w-full flex flex-row flex-nowrap gap-4 sm:!gap-x-6 md:!gap-x-8",
   "example-image":
     "sm:rounded-lg md:rounded-xl lg:rounded-3xl border border-2 border-gray-100 shadow-sm dark:!border-gray-900 hover:shadow-md transition-all duration-500 my-2 w-full sm:h-full z-10 relative block",
   "example-image-link":

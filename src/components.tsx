@@ -1,8 +1,8 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { createSrcSet, slugify } from "~/src/utils.ts";
-import { type ComponentChildren, decode, Fragment, h, is } from "~/deps.ts";
-import { meta, paramList } from "~/src/constants.ts";
+import { createSrcSet, slugify } from "./utils.ts";
+import { type ComponentChildren, decode, Fragment, h, is } from "../deps.ts";
+import { meta, paramList } from "./constants.ts";
 
 export const Footer = ({ ...props }) => (
   <footer
@@ -251,7 +251,7 @@ export const DeployButton = (
     href="https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo"
     class="btn-large group"
   >
-    {Icon && <Icon class="filter -invert-[1.0] w-6 h-6" />}
+    {Icon && <Icon class="btn-icon" />}
     <span class="text-sm sm:text-base md:text-lg font-semibold">
       {children}
     </span>
@@ -275,12 +275,102 @@ export const GitHubButton = ({
     title={children ?? "View on GitHub"}
     {...props}
   >
-    {icon && <GitHubIcon class="filter -invert-[1.0] w-6 h-6" />}
+    {icon && <GitHubIcon class="btn-icon" />}
     <span class="text-sm sm:text-base md:text-lg font-semibold">
       {children ?? "View on GitHub"}
     </span>
   </Link>
 );
+
+/**
+ * Toggle between the light/dark side of the force.
+ */
+export function ColorSchemeButton({ ...props }: { [prop: string]: any } = {}) {
+  return ( // @ts-ignore bad types
+    <button
+      class="btn-colorscheme"
+      onclick="setColorScheme((localStorage.getItem('color-scheme')==='dark'?'light':'dark'))"
+      {...props}
+    >
+      <SunIcon class="inline-block dark:!hidden w-8 h-8 text-yellow-400 dark:text-yellow-500" />
+      <MoonIcon class="hidden dark:!inline-block w-8 h-8 text-slate-400 dark:text-slate-500" />
+    </button>
+  );
+}
+
+/**
+ * For the night owls.
+ */
+export function MoonIcon({ ...props }: { [prop: string]: any } = {}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      class="w-8 h-8"
+      {...props}
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M17.715 15.15A6.5 6.5 0 0 1 9 6.035C6.106 6.922 4 9.645 4 12.867c0 3.94 3.153 7.136 7.042 7.136 3.101 0 5.734-2.032 6.673-4.853Z"
+        class="fill-transparent"
+      />
+      <path
+        d="m17.715 15.15.95.316a1 1 0 0 0-1.445-1.185l.495.869ZM9 6.035l.846.534a1 1 0 0 0-1.14-1.49L9 6.035Zm8.221 8.246a5.47 5.47 0 0 1-2.72.718v2a7.47 7.47 0 0 0 3.71-.98l-.99-1.738Zm-2.72.718A5.5 5.5 0 0 1 9 9.5H7a7.5 7.5 0 0 0 7.5 7.5v-2ZM9 9.5c0-1.079.31-2.082.845-2.93L8.153 5.5A7.47 7.47 0 0 0 7 9.5h2Zm-4 3.368C5 10.089 6.815 7.75 9.292 6.99L8.706 5.08C5.397 6.094 3 9.201 3 12.867h2Zm6.042 6.136C7.718 19.003 5 16.268 5 12.867H3c0 4.48 3.588 8.136 8.042 8.136v-2Zm5.725-4.17c-.81 2.433-3.074 4.17-5.725 4.17v2c3.552 0 6.553-2.327 7.622-5.537l-1.897-.632Z"
+        class="fill-slate-400 dark:fill-slate-500"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M17 3a1 1 0 0 1 1 1 2 2 0 0 0 2 2 1 1 0 1 1 0 2 2 2 0 0 0-2 2 1 1 0 1 1-2 0 2 2 0 0 0-2-2 1 1 0 1 1 0-2 2 2 0 0 0 2-2 1 1 0 0 1 1-1Z"
+        class="fill-slate-400 dark:fill-slate-500"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Brighten things up with a little light in your life.
+ */
+export function SunIcon({ ...props }: { [prop: string]: any } = {}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      class="w-8 h-8"
+      {...props}
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0a4 4 0 0 1 8 0Z"
+      />
+    </svg>
+  );
+}
+
+/**
+ * The favicon SVG!
+ */
+export function Favicon({ ...props }: { [prop: string]: any } = {}) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <linearGradient id="ukraine" x1="1" x2="1" y1="0" y2="1">
+        <stop offset="0.5" stop-color="#155ccc" />
+        <stop offset="0.5" stop-color="#fcc500" />
+      </linearGradient>
+      <path
+        fill="url(#ukraine)"
+        d="M13 7h2v8a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1h2v1h2V7m-1-5a10 10 0 0 1 10 10a10 10 0 0 1-10 10A10 10 0 0 1 2 12A10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8a8 8 0 0 0 8 8a8 8 0 0 0 8-8a8 8 0 0 0-8-8Z"
+      />
+    </svg>
+  );
+}
 
 export const ParamList = () => {
   const Parameter = ({ data, idx, ...props }) => {
