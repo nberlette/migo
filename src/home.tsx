@@ -14,7 +14,7 @@ import {
   RouteSchema,
 } from "./components.tsx";
 
-export const Home = () => {
+export function Home() {
   return (
     <>
       <div class="max-w-2xl px-8 mx-auto h-screen relative">
@@ -22,7 +22,7 @@ export const Home = () => {
           {/* Header */}
           <header class="app-header relative">
             <h1 class="app-title">
-              <a href="/" title={site.title} rel="noopener">migo</a>
+              <Link href="/" title={site.title}>migo</a>
             </h1>
             <ColorSchemeButton class="absolute top-7 right-2" />
           </header>
@@ -37,25 +37,25 @@ export const Home = () => {
 
           {/* What is this? */}
           <Heading title="What is this?">What is this?</Heading>
-          <p class="my-2 md:my-2.5 text-sm md:text-base text-center leading-6">
-            Migo is a free service to generate OpenGraph Images and globally
+          <p class="my-2 md:my-2.5 text-sm sm:text-base md:text-lg text-left leading-6">
+            Migo is a free microservice to generate dynamic OpenGraph Images, globally
             deployed on{" "}
-            <Link url="https://deno.com/deploy">Deno Deploy</Link>. Images are
+            <Link href="https://deno.com/deploy">Deno Deploy</Link>. Images are
             rendered as SVG, rasterized to PNG, and cached as immutable assets
             with{" "}
-            <Link url="https://developers.cloudflare.com/workers/runtime-apis/kv">
+            <Link href="https://developers.cloudflare.com/workers/runtime-apis/kv">
               Cloudflare KV
-            </Link>, providing low-latency responses that scale.
+            </Link>, providing low-latency responses that scale. 
           </p>
-          <p class="mb-2 mt-4 md:mt-5 md:mb-2.5 text-sm sm:text-base md:text-lg text-center leading-6">
-            Read further documentation or check out the source code{"  "}
-            <Link url="https://github.com/nberlette/migo#readme">
+          <p class="mb-2 mt-4 md:mt-5 md:mb-2.5 text-sm md:text-base text-left leading-6">
+            Read more or check out the source code{"  "}
+            <Link href="https://github.com/nberlette/migo#readme">
               GitHub Repository
-            </Link>. If you encounter any bugs please{" "}
-            <Link url="https://github.com/nberlette/migo/issues/new">
-              create a new issue
+            </Link>. Found a bug? Please{" "}
+            <Link href="https://github.com/nberlette/migo/issues/new">
+              create an issue
             </Link>{" "}
-            so it can be fixed.
+            so it can be fixed. Thanks!
           </p>
 
           {/* Schema */}
