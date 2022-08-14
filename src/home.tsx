@@ -22,7 +22,7 @@ export function Home() {
           {/* Header */}
           <header class="app-header relative">
             <h1 class="app-title">
-              <Link href="/" title={site.title}>migo</a>
+              <Link href="/" title={site.title}>migo</Link>
             </h1>
             <ColorSchemeButton class="absolute top-7 right-2" />
           </header>
