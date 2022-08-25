@@ -96,7 +96,7 @@ export async function generateSVG({
 
   const {
     titleFontSize = "48",
-    titleFontFamily = "sans-serif",
+    titleFontFamily = "serif",
     titleFontWeight = "bold",
     titleX = (+width / 2),
     titleY = ((+iconH) + (+iconY * 2) + (+titleFontSize * 1)),
@@ -142,7 +142,7 @@ export async function generateSVG({
       iconType = "none";
     }
 
-    if (new URL(iconUrl).pathname.endsWith(".svg")) {
+    if (/(\.svg|^data[:]image\/svg+xml)/ig.test(new URL(iconUrl).href)) {
       iconType = "svg";
       iconContents = await generateIcon(iconUrl, {
         iconColor,
@@ -177,7 +177,8 @@ export async function generateSVG({
   if (iconType === "svg") {
     Object.assign(iconProps, {
       href: "#icon",
-      fill: iconColor ?? titleColor,
+      color: iconColor || titleColor,
+      fill: "currentColor",
       stroke: iconStroke ?? "none",
       "stroke-width": +iconStrokeWidth || 0,
     });
@@ -217,7 +218,7 @@ export async function generateSVG({
       <rect {...rectProps} />
       <g>
         {iconType === "svg"
-          ? <use {...iconProps} />
+          ? <use color={iconColor ?? titleColor} {...iconProps} />
           : (iconType !== "none" && <image {...iconProps} />)}
         <text {...titleProps}>
           <tspan>{decode(title)}</tspan>
