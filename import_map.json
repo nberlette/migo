@@ -8,7 +8,7 @@
     "deps.ts": "./deps.ts",
     "~/deps": "./deps.ts",
     "~/deps.ts": "./deps.ts",
-    "std/": "https://deno.land/std@0.151.0/",
+    "std/": "https://deno.land/std@0.153.0/",
     "esm/": "https://esm.sh/",
     "deno/": "https://deno.land/x/",
     "preact": "https://esm.sh/preact@10.10.0",
@@ -26,12 +26,12 @@
     "sift": "https://deno.land/x/sift@0.5.0/mod.ts",
     "sift/": "https://deno.land/x/sift@0.5.0/",
     "colorhash": "https://deno.land/x/color_hash@v2.0.1/mod.ts",
-    "resvg": "https://deno.land/x/resvg_wasm@0.1.0/mod.ts",
+    "resvg": "https://deno.land/x/resvg_wasm@0.2.0/mod.ts",
     "aleph/server": "https://deno.land/x/aleph/server/mod.ts",
     "aleph/": "https://deno.land/x/aleph@1.0.0-beta.1/",
     "@unocss/": "https://deno.land/x/aleph@1.0.0-beta.1/lib/@unocss/",
-    "911": "https://deno.land/x/911@0.0.5/mod.ts",
-    "911/": "https://deno.land/x/911@0.0.5/src/"
+    "911": "https://deno.land/x/911@0.1.5/mod.ts",
+    "911/": "https://deno.land/x/911@0.1.5/src/"
   },
   "scopes": {}
 }
