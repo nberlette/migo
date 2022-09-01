@@ -1,21 +1,31 @@
-import { Logger } from "911";
+import { Logger } from "https://deno.land/x/911@0.1.5/mod.ts";
 
 export { formatHex, parse as parseColor } from "culori";
+
 export { default as GOKV } from "gokv";
+
 export { html } from "htm";
+
 export { UnoCSS } from "htm/plugins.ts";
+
 export { default as presetWind } from "@unocss/preset-wind.ts";
+
 export { type ConnInfo, type Routes, serve, Status, STATUS_TEXT } from "sift";
+
 export { render as renderToString } from "preact/render";
+
 export { default as colorHash } from "colorhash";
-export { render as rasterizeSVG } from "resvg";
+
+export { render as rasterizeSVG } from "https://deno.land/x/resvg_wasm@0.2.0/mod.ts";
+
 export { config as dotenv } from "https://deno.land/std@0.153.0/dotenv/mod.ts";
-export { is } from "is";
+
+export { is } from "https://deno.land/x/dis@0.0.1/mod.ts";
+
 export * from "preact";
 
 export {
   camelCase,
-  computeHash,
   decode,
   encode,
   etag,
@@ -36,7 +46,8 @@ export {
   upperCase,
   utf8TextDecoder,
   utf8TextEncoder,
-} from "911";
+  default as _,
+} from "https://deno.land/x/911@0.1.5/mod.ts";
 
 export const log = new Logger({
   level: "debug",
