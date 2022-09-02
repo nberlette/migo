@@ -8,12 +8,9 @@ export const DEBUG = (+Deno.env.get("DEBUG") === 1);
  * @example https://icns.deno.dev -> https://icns.deno.dev/twemoji:letter-m.svg
  */
 export const CDN_URL = "https://icns.deno.dev" as const;
-
 export const FAVICON_URL = `${CDN_URL}/twemoji:letter-m.svg` as const;
-
-export const ERROR_ICON_URL = `${CDN_URL}/heroicons-solid:exclamation.svg` as const;
-
-export const FALLBACK_ICON_URL = `${CDN_URL}/simple-icons:deno.svg` as const;
+export const FALLBACK_ICON_URL =
+  `${CDN_URL}/heroicons-solid:exclamation.svg` as const;
 
 /**
  * various cache TTL values, from 1 minute to 1 year
@@ -104,7 +101,7 @@ export const site = {
   keywords:
     "deno deploy,migo,edge,api,serverless,opengraph,generator,dynamic,image generator,social media,social images,deno,cover+images,ogimage,twittercard api,cloudflare,workers,generator",
   image:
-    "https://migo.deno.dev/image.png?subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=twemoji:letter-m&title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev.png",
+    "/subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=twemoji:letter-m/Edge-rendered%20OpenGraph%20Images/migo.deno.dev.png",
   repository: "https://github.com/nberlette/migo",
 } as const;
 
@@ -116,11 +113,11 @@ export const styles = [
  * Document `<meta>` tags added in the page `<head>`
  */
 export const meta: Meta = {
-  "viewport": "width=device-width, initial-scale=1.0",
-  "title": site.title,
-  "author": site.author,
-  "description": site.description,
-  "keywords": site.keywords,
+  viewport: "width=device-width, initial-scale=1.0",
+  title: site.title,
+  author: site.author,
+  description: site.description,
+  keywords: site.keywords,
   "og:url": site.url,
   "og:type": "website",
   "og:image": site.image,
