@@ -57,7 +57,7 @@ export const site = {
   keywords:
     "deno deploy,migo,edge,api,serverless,opengraph,generator,dynamic,image generator,social media,social images,deno,cover+images,ogimage,twittercard api,cloudflare,workers,generator",
   image:
-    "/image.png?title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev&subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=noto:t-rex&pxRatio=1.5&borderRadius=1.66rem",
+    "/image.png?title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev&subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=noto:t-rex&pxRatio=1.5&borderRadius=25",
   repository: "https://github.com/nberlette/migo",
 } as const;
 
