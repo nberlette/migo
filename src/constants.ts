@@ -1,5 +1,3 @@
-import { encode, portal } from "./utils.ts";
-
 export const DEBUG = (+Deno.env.get("DEBUG") === 1);
 
 /**
@@ -15,23 +13,18 @@ export const FALLBACK_ICON_URL =
 /**
  * various cache TTL values, from 1 minute to 1 year
  */
-export const TTL_MN = portal(1, "minute");
-export const TTL_1H = portal(1, "hour");
-export const TTL_1D = portal(1, "day");
-export const TTL_1W = portal(1, "week");
-export const TTL_1M = portal(1, "month");
-export const TTL_1Y = portal(1, "year");
+export const YEAR = 86400 * 365;
+export const TTL_1Y = YEAR;
 
 /**
  * Cache-Control header values for long-term, short-term, and no-cache.
  */
 export const cacheTerm: Record<string, string> = {
   none: "public, no-cache, no-store, s-maxage=0, max-age=0, must-revalidate",
-  short: `public, s-maxage=${portal(0.5, "hour")}, max-age=${
-    portal(0.5, "hour")
-  }, stale-if-error=${portal(2, "min")}, stale-while-revalidate=60`,
+  short:
+    `public, s-maxage=1800, max-age=1800, stale-if-error=120, stale-while-revalidate=60`,
   long:
-    `public, s-maxage=${TTL_1Y}, max-age=${TTL_1Y}, stale-if-error=${TTL_1H}, immutable`,
+    `public, s-maxage=${YEAR}, max-age=${YEAR}, stale-if-error=${YEAR}, immutable`,
 } as const;
 
 /**
@@ -42,52 +35,15 @@ export const defaultParams = {
   subtitle: "migo.deno.dev",
   width: "1280",
   height: "640",
-  pxRatio: "2",
-  icon: "twemoji:letter-m",
+  pxRatio: "1.5",
+  icon: "noto:t-rex",
   iconW: "240",
   iconH: "240",
-  bgColor: "papayawhip",
+  bgColor: "f0f0f0",
   titleColor: "#112233",
-  titleFontSize: "48",
+  titleFontSize: "64",
   subtitleFontSize: "36",
 };
-
-// function useParams({ width, height, ...params }) {
-
-//   return {
-//     ...defaultParams,
-//     width,
-//     height,
-//     viewBox: `0 0 ${width} ${height}`,
-//     bgColor: "ffffff",
-//     pxRatio: 2,
-//     icon: "deno",
-//     iconUrl: null,
-//     iconW: "240",
-//     iconH: iconW,
-//     iconX: ((+defaultParams.width - +defaultParams.iconW) / 2),
-//     iconY: (+defaultParams.iconH / 3),
-//     titleFontSize: "48",
-//     titleFontFamily: "sans-serif",
-//     titleFontWeight: "bold",
-//     titleX: (+defaultParams.width / 2),
-//     titleY: ((+defaultParams.iconH) + (+defaultParams.iconY * 2) + (+defaultParams.titleFontSize * 1)),
-//     subtitleFontSize: 32,
-//     subtitleFontFamily: "monospace",
-//     subtitleFontWeight: "normal",
-//     subtitleX: (+defaultParams.width / 2),
-//     subtitleY: (+defaultParams.titleY + (+defaultParams.subtitleFontSize * 2)),
-//     titleColor: "#123",
-//     titleStroke: "none",
-//     titleStrokeWidth: 0,
-//     subtitleColor: "#345",
-//     subtitleStroke: "none",
-//     subtitleStrokeWidth: 0,
-//     iconColor: defaultParams.titleColor,
-//     iconStroke: "none",
-//     iconStrokeWidth: 0,
-//   }
-// }
 
 /**
  * Metadata for SEO
@@ -101,7 +57,7 @@ export const site = {
   keywords:
     "deno deploy,migo,edge,api,serverless,opengraph,generator,dynamic,image generator,social media,social images,deno,cover+images,ogimage,twittercard api,cloudflare,workers,generator",
   image:
-    "/subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=twemoji:letter-m/Edge-rendered%20OpenGraph%20Images/migo.deno.dev.png",
+    "/image.png?title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev&subtitleFontSize=48&bgColor=123&titleColor=fff&subtitleColor=papayawhip&icon=noto:t-rex&pxRatio=1.5&borderRadius=1.66rem",
   repository: "https://github.com/nberlette/migo",
 } as const;
 
@@ -158,10 +114,10 @@ export const paramList = [
   ["width", "1280"],
   ["height", "640"],
   ["viewBox", "0 0 1280 640"],
-  ["pxRatio", "2", "// set to 1 for low-res"],
+  ["pxRatio", "1.5", "// set to 1 for low-res"],
   ["bgColor", "white"],
-  ["// icon"],
-  ["icon", "deno", "// set to false to disable"],
+  ["borderRadius", "0", "// rounded image corners"]["// icon"],
+  ["icon", "noto:t-rex", "// set to false to disable"],
   ["iconUrl", "https://icns.ml/{icon}.svg"],
   ["iconW", "240"],
   ["iconH", "240", "// +iconW"],
@@ -173,7 +129,7 @@ export const paramList = [
   ["// title (first line of text)"],
   ["titleX", "640", "// (width / 2)"],
   ["titleY", "450", "// (iconH + iconY + (titleFontSize * 2.5))"],
-  ["titleFontSize", "48"],
+  ["titleFontSize", "64"],
   ["titleFontFamily", "sans-serif", '// "Inter"'],
   ["titleFontWeight", "bold"],
   ["titleColor", "#112233", "// text color"],

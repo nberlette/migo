@@ -1,4 +1,5 @@
 /// <reference no-default-lib="true" />
+
 /** @jsx h */
 import {
   type ConnInfo,
@@ -27,13 +28,7 @@ import {
 } from "./src/constants.ts";
 import { Home } from "./src/home.tsx";
 import { formatKey, generateSVG, newResponse, Params } from "./src/utils.ts";
-import { config as dotenv } from "std/dotenv/mod.ts";
 
-try {
-  await dotenv({
-    allowEmptyValues: true,
-  });
-} catch { /* noop */ }
 /**
  * Authenticate and configure Cloudflare KV
  * @see {@link https://gokv.io}
@@ -195,14 +190,9 @@ const handle = {
   favicon: async () =>
     newResponse(await fetch(FAVICON_URL).then((r) => r.arrayBuffer())),
   robotsTxt: () =>
-    newResponse(
-      `User-agent: *
-Disallow: *.png,*.svg
-`,
-      {
-        contentType: "text/plain",
-      },
-    ),
+    newResponse(`User-agent: *\nDisallow: *.png,*.svg\n`, {
+      contentType: "text/plain",
+    }),
 };
 
 serve({
