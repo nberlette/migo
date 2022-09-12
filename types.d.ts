@@ -70,6 +70,7 @@ interface BaseProps {
   width: number;
   height: number;
   pxRatio: number;
+  borderRadius: string | number;
   viewBox: string;
   xmlns: string;
   role: string;

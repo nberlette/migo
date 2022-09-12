@@ -548,7 +548,6 @@ export { decode, encode, etag, json, kebabCase, sha1, sha256 };
 
 export {
   camelCase,
-  computeHash,
   formatHex,
   groupBy,
   isObject,

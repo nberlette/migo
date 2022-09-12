@@ -6,7 +6,6 @@
 
 /** @jsx h */
 /** @jsxFrag Fragment */
-
 import {
   colorHash,
   decode,
@@ -16,9 +15,7 @@ import {
   parseColor,
   renderToString,
 } from "../deps.ts";
-
 import { adjustViewBoxValue, Params, sanitizeIcon } from "./utils.ts";
-
 import { CDN_URL, defaultParams, FALLBACK_ICON_URL } from "./constants.ts";
 
 export async function generateIcon(
@@ -86,15 +83,13 @@ export async function generateSVG({
     viewBox = `0 0 ${width} ${height}`,
     bgColor = "#fff",
     pxRatio = "2",
+    borderRadius = "0",
     iconW = "240",
     iconH = iconW,
     iconX = ((+width - +iconW) / 2),
     iconY = (+iconH / 3),
     iconStroke = "none",
     iconStrokeWidth = "0",
-  } = mergedParams ?? {};
-
-  const {
     titleFontSize = "48",
     titleFontFamily = "serif",
     titleFontWeight = "bold",
@@ -166,7 +161,14 @@ export async function generateSVG({
     width: `${+width * +pxRatio}`,
     height: `${+height * +pxRatio}`,
   };
-  const rectProps = { fill: bgColor, x: 0, y: 0, width, height };
+  const rectProps = {
+    fill: bgColor,
+    x: 0,
+    y: 0,
+    width,
+    height,
+    rx: borderRadius,
+  };
   const iconProps = {
     x: iconX,
     y: iconY,
@@ -218,7 +220,7 @@ export async function generateSVG({
       <rect {...rectProps} />
       <g>
         {iconType === "svg"
-          ? <use color={iconColor ?? titleColor} {...iconProps} />
+          ? <use fill={iconColor ?? titleColor} {...iconProps} />
           : (iconType !== "none" && <image {...iconProps} />)}
         <text {...titleProps}>
           <tspan>{decode(title)}</tspan>

@@ -38,14 +38,14 @@ export function Home() {
           {/* What is this? */}
           <Heading title="What is this?">What is this?</Heading>
           <p class="my-2 md:my-2.5 text-sm sm:text-base md:text-lg text-left leading-6">
-            Migo is a free microservice to generate dynamic OpenGraph Images, globally
-            deployed on{" "}
+            Migo is a free microservice to generate dynamic OpenGraph Images,
+            globally deployed on{" "}
             <Link href="https://deno.com/deploy">Deno Deploy</Link>. Images are
             rendered as SVG, rasterized to PNG, and cached as immutable assets
             with{" "}
             <Link href="https://developers.cloudflare.com/workers/runtime-apis/kv">
               Cloudflare KV
-            </Link>, providing low-latency responses that scale. 
+            </Link>, providing low-latency responses that scale.
           </p>
           <p class="mb-2 mt-4 md:mt-5 md:mb-2.5 text-sm md:text-base text-left leading-6">
             Read more or check out the source code{"  "}
@@ -74,4 +74,4 @@ export function Home() {
       </div>
     </>
   );
-};
+}
