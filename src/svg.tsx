@@ -86,15 +86,13 @@ export async function generateSVG({
     viewBox = `0 0 ${width} ${height}`,
     bgColor = "#fff",
     pxRatio = "2",
+    borderRadius = "0",
     iconW = "240",
     iconH = iconW,
     iconX = ((+width - +iconW) / 2),
     iconY = (+iconH / 3),
     iconStroke = "none",
     iconStrokeWidth = "0",
-  } = mergedParams ?? {};
-
-  const {
     titleFontSize = "48",
     titleFontFamily = "serif",
     titleFontWeight = "bold",
@@ -166,7 +164,7 @@ export async function generateSVG({
     width: `${+width * +pxRatio}`,
     height: `${+height * +pxRatio}`,
   };
-  const rectProps = { fill: bgColor, x: 0, y: 0, width, height };
+  const rectProps = { fill: bgColor, x: 0, y: 0, width, height, rx: borderRadius };
   const iconProps = {
     x: iconX,
     y: iconY,
