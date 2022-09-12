@@ -158,7 +158,7 @@ const handle = {
     data = await generateSVG({ params, type });
 
     if (type === "png") {
-      data = rasterizeSVG(data);
+      data = await rasterizeSVG(data);
     }
 
     try {
