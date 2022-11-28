@@ -5,7 +5,7 @@ _**Generate dynamic OpenGraph images on Deno's Edge Network**_
 
 </div><br />
 
-[![Click here for example OpenGraph Images][example-0]](#examples "Click here for example OpenGraph Images")
+[![Click here for example OpenGraph Images][example-img-0]](#examples "Click here for example OpenGraph Images")
 
 ---
 
@@ -142,13 +142,13 @@ cache hit from their nearest edge datacenter.
 
 ## Examples
 
-![Edge-rendered OpenGraph Images on Deno][example-1]
+![Edge-rendered OpenGraph Images on Deno][example-img-1]
 
-![Creating Dynamic Social Cover Images][example-2]
+![Creating Dynamic Social Cover Images][example-img-2]
 
-![Nuxt Content Wind Starter][example-3]
+![Nuxt Content Wind Starter][example-img-3]
 
-![Deno Module Starter][example-4]
+![Deno Module Starter][example-img-4]
 
 ---
 
@@ -169,9 +169,9 @@ MIT © [Nicholas Berlette][nberlette]
 [resvg]: https://deno.land/x/resvg_wasm "Resvg Wasm"
 [deno]: https://deno.com/deploy "Deno Deploy"
 [deploy]: https://dash.deno.com/new?url=https%3a%2f%2fgithub.com%2fnberlette%2fmigo%2fraw%2fmain%2fmain.tsx "Deploy with Deno!"
-[examples-splash]: https://migo.deno.dev/image.png?icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=fff&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=999&titleY=425&subtitleFontSize=36&title=Click%20here%20for%20example%20OG%20Images&subtitle=(or%20scroll%20down)&pxRatio=1.5&borderRadius=25
-[example-0]: https://migo.deno.dev/image.png?title=migo.deno.dev&subtitle=Dynamic+OpenGraph+Images+on+Deno+Deploy&titleFontFamily=serif&titleFontSize=72&titleFontWeight=900&titleTextAnchor=left&titleX=160&titleY=110&subtitleFontSize=36&subtitleFontWeight=900&subtitleFontFamily=monospace&subtitleTextAnchor=left&subtitleX=40&subtitleY=250&pxRatio=1.5&width=1000&height=300&bgColor=111827&titleColor=fff&subtitleColor=ddd&icon=noto:t-rex&iconW=100&iconH=100&iconX=40&iconY=30&borderRadius=20
-[example-1]: https://migo.deno.dev/image.png?icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=fff&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48&title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev&pxRatio=1.5&borderRadius=25&titleFontFamily=sans-serif
-[example-2]: https://migo.deno.dev/image.png?icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48&title=Creating%20Dynamic%20Cover%20Images&subtitle=By%20Nicholas%20Berlette&borderRadius=25&titleFontFamily=monospace
-[example-3]: https://migo.deno.dev/image.png?icon=nuxtdotjs&bgColor=112233&iconColor=00DC82&iconStroke=00DC82&iconStrokeWidth=0.55&titleColor=00DC82&subtitleColor=e0e0e0&iconW=300&iconY=50&titleY=460&title=Nuxt%20ContentWind%20Starter&subtitle=stackblitz.com%2fedit%2fcontent-wind&borderRadius=30&pxRatio=1.5
-[example-4]: https://migo.deno.dev/image.png?title=deno911⁄+kit&subtitle=this+one+has+custom+alignment+and+size!&titleFontFamily=sans-serif&titleFontSize=80&titleFontWeight=900&titleTextAnchor=right&titleX=160&titleY=115&subtitleFontSize=36&subtitleFontWeight=900&subtitleFontFamily=monospace&subtitleTextAnchor=left&subtitleX=40&subtitleY=260&pxRatio=1.5&width=1000&height=300&bgColor=fff&titleColor=123&subtitleColor=456&icon=noto:sauropod&iconW=100&iconH=100&iconX=40&iconY=30&borderRadius=20
+[examples-splash]: https://migo.deno.dev/image.png?icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=fff&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=999&titleY=425&subtitleFontSize=36&title=Click%20here%20for%20example%20OG%20Images&subtitle=(or%20scroll%20down)&pxRatio=1&borderRadius=25
+[example-img-0]: https://migo.deno.dev/image.png?title=migo.deno.dev&subtitle=Dynamic+OpenGraph+Images+on+Deno+Deploy&titleFontFamily=serif&titleFontSize=72&titleFontWeight=900&titleTextAnchor=left&titleX=160&titleY=110&subtitleFontSize=36&subtitleFontWeight=900&subtitleFontFamily=monospace&subtitleTextAnchor=left&subtitleX=40&subtitleY=250&pxRatio=1&width=1000&height=300&bgColor=111827&titleColor=fff&subtitleColor=ddd&icon=noto:t-rex&iconW=100&iconH=100&iconX=40&iconY=30&borderRadius=20
+[example-img-1]: https://migo.deno.dev/image.png?icon=deno&iconStrokeWidth=0.33&subtitleFontSize=48&iconColor=fff&bgColor=234&iconStroke=fff&titleColor=fff&subtitleColor=papayawhip&titleY=425&subtitleFontSize=48&title=Edge-rendered%20OpenGraph%20Images&subtitle=migo.deno.dev&pxRatio=1&borderRadius=25&titleFontFamily=sans-serif
+[example-img-2]: https://migo.deno.dev/image.png?icon=twitter&subtitleFontSize=48&iconColor=0cf&titleY=460&subtitleFontSize=48&title=Creating%20Dynamic%20Cover%20Images&subtitle=By%20Nicholas%20Berlette&borderRadius=25&titleFontFamily=monospace
+[example-img-3]: https://migo.deno.dev/image.png?icon=nuxtdotjs&bgColor=112233&iconColor=00DC82&iconStroke=00DC82&iconStrokeWidth=0.55&titleColor=00DC82&subtitleColor=e0e0e0&iconW=300&iconY=50&titleY=460&title=Nuxt%20ContentWind%20Starter&subtitle=stackblitz.com%2fedit%2fcontent-wind&borderRadius=30&pxRatio=1
+[example-img-4]: https://migo.deno.dev/image.png?title=deno911⁄+kit&subtitle=this+one+has+custom+alignment+and+size!&titleFontFamily=sans-serif&titleFontSize=80&titleFontWeight=900&titleTextAnchor=right&titleX=160&titleY=115&subtitleFontSize=36&subtitleFontWeight=900&subtitleFontFamily=monospace&subtitleTextAnchor=left&subtitleX=40&subtitleY=260&pxRatio=1&width=1000&height=300&bgColor=fff&titleColor=123&subtitleColor=456&icon=noto:sauropod&iconW=100&iconH=100&iconX=40&iconY=30&borderRadius=20
