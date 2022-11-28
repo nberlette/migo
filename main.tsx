@@ -40,8 +40,6 @@ import {
   Params,
 } from "./src/utils.ts";
 
-const cache = await caches?.open?.(cacheName || "default");
-
 if (DEBUG) {
   console.info(
     "%c%s\n",
@@ -77,11 +75,15 @@ const handle = {
       const cacheKey = new URL(url);
       cacheKey.search = "?" + params.toString();
 
-      // making use of Deno's new Cache API
-      const cached = await cache?.match?.(cacheKey);
-      if (is.response(cached)) {
-        return cached;
-      }
+      let cache: Cache | undefined;
+      try {
+        cache = await caches?.open?.(cacheName || "default");
+        // making use of Deno's new Cache API
+        const cached = await cache?.match?.(cacheKey);
+        if (is.response(cached)) {
+          return cached;
+        }
+      } catch { /* ignore */ }
 
       let status = 201;
       const headers = new Headers();
@@ -100,13 +102,15 @@ const handle = {
         body = await rasterizeSVG(body);
       }
 
-      const responseToCache = await createResponse(body, {
-        headers,
-        status: 200,
-        contentType,
-      });
+      try {
+        const responseToCache = await createResponse(body, {
+          headers,
+          status: 200,
+          contentType,
+        });
 
-      cache?.put?.(cacheKey, responseToCache);
+        cache?.put?.(cacheKey, responseToCache);
+      } catch { /* ignore */ }
 
       return createResponse(body, {
         headers,
