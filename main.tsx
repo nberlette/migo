@@ -40,7 +40,7 @@ import {
   Params,
 } from "./src/utils.ts";
 
-const cache = await caches.open(cacheName || "default");
+const cache = await caches?.open?.(cacheName || "default");
 
 if (DEBUG) {
   console.info(
