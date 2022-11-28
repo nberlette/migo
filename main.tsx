@@ -75,10 +75,10 @@ const handle = {
       // use a normalized set of parameters for more aggressive caching
       const params = collectParams(url, pathParams);
       const cacheKey = new URL(url);
-      url.search = "?" + params.toString();
+      cacheKey.search = "?" + params.toString();
 
       // making use of Deno's new Cache API
-      const cached = await caches?.match?.(cacheKey, { cacheName });
+      const cached = await cache?.match?.(cacheKey);
       if (is.response(cached)) {
         return cached;
       }
