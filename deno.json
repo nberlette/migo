@@ -1,7 +1,6 @@
 {
   "importMap": "import_map.json",
   "compilerOptions": {
-    "strict": false,
     "lib": [
       "dom",
       "dom.iterable",
@@ -16,31 +15,17 @@
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "jsxImportSource": "https://esm.sh/preact@10.10.0",
-    "strictNullChecks": false
+    "jsxImportSource": "peact"
   },
   "fmt": {
     "files": {
       "exclude": [
         "static",
-        ".vscode",
-        ".gitpod.yml",
-        ".git*",
-        ".env*"
+        "./{.vscode,.devcontainer,.gitpod.yml,.git*,.env*}"
       ]
     }
   },
   "lint": {
-    "files": {
-      "exclude": [
-        "static",
-        "test",
-        ".vscode",
-        "README.md",
-        "LICENSE",
-        "./deps.ts"
-      ]
-    },
     "rules": {
       "exclude": [
         "no-explicit-any",

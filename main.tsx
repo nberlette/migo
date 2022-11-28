@@ -1,15 +1,17 @@
 /// <reference no-default-lib="true" />
+/// <reference lib="deno.ns" />
+/// <reference lib="deno.window" />
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+/// <reference lib="dom.extras" />
 
 /** @jsx h */
 import {
+  ColorScheme,
   type ConnInfo,
-  decode,
-  formatHex,
-  GOKV,
+  etag,
   h,
   html,
-  lowerCase,
-  parseColor,
   presetWind,
   rasterizeSVG,
   type Routes,
@@ -17,43 +19,37 @@ import {
   UnoCSS,
 } from "./deps.ts";
 
+import { assert, is } from "is";
+
 import {
-  defaultParams,
+  cacheName,
+  CACHING,
+  DEBUG,
   FAVICON_URL,
   links,
   meta,
   shortcuts,
   styles,
-  TTL_1Y,
 } from "./src/constants.ts";
+
 import { Home } from "./src/home.tsx";
-import { formatKey, generateSVG, newResponse, Params } from "./src/utils.ts";
+import {
+  collectParams,
+  createResponse,
+  generateSVG,
+  Params,
+} from "./src/utils.ts";
 
-/**
- * Authenticate and configure Cloudflare KV
- * @see {@link https://gokv.io}
- */
-const namespace = Deno.env.get("GOKV_NAMESPACE") ?? "migo";
+const cache = await caches.open(cacheName || "default");
 
-try {
-  const token = Deno.env.get("GOKV_TOKEN") ?? null;
-  GOKV.config({ token });
-} catch (cause) {
-  throw new Error(`Failed to configure GOKV!`, { cause });
+if (DEBUG) {
+  console.info(
+    "%c%s\n",
+    "font-weight:bold;color:#8dddff;",
+    String.fromCodePoint(0x24dc, 0x20, 0x24d8, 0x20, 0x24d6, 0x20, 0x24de) +
+      "  ",
+  );
 }
-
-export const $kv = GOKV.KV({ namespace: `${namespace}-kv` });
-
-html.use(UnoCSS({
-  presets: [presetWind()] as any,
-  shortcuts,
-}));
-
-console.info(
-  "%c%s\n",
-  "font-weight:bold;color:#8dddff;",
-  String.fromCodePoint(0x24dc, 0x20, 0x24d8, 0x20, 0x24d6, 0x20, 0x24de) + "  ",
-);
 
 const handle = {
   /** image request handler */
@@ -62,137 +58,104 @@ const handle = {
     connInfo: ConnInfo,
     pathParams: Record<string, string>,
   ) {
-    const url = new URL(req.url);
-    const type: string = pathParams?.type ?? "png";
-
-    let contentType = "image/svg+xml;charset=utf-8";
-    if (type === "png") {
-      contentType = "image/png;charset=utf-8";
-    }
-    if (!["png", "svg"].includes(type)) {
-      const newUrl = new URL(url);
-      newUrl.pathname = newUrl.pathname + ".png";
-      return Response.redirect(newUrl, 301);
-    }
-
-    // janky way to fix some routing issues
-    if (pathParams.params == null) {
-      if (
-        pathParams.title != null && Params.pattern.params.test(pathParams.title)
-      ) {
-        pathParams.params = pathParams.title;
-        if (pathParams.subtitle != null) {
-          pathParams.title = pathParams.subtitle;
-          delete pathParams.subtitle;
-        } else {
-          delete pathParams.title;
-        }
-      } else if (Params.pattern.params.test(pathParams.subtitle)) {
-        pathParams.params = pathParams.subtitle;
-        delete pathParams.subtitle;
-      } else {
-        pathParams.params = pathParams.title;
-      }
-    }
-    /**
-     * If path parameters have been provided, combine them with any existing query params,
-     * for maximum compatibility and flexibility with different requests.
-     */
-    const pathParameters = new Params(decode(pathParams?.params));
-    const searchParams = new Params(url.searchParams.toString());
-    const mergedParams = {
-      ...defaultParams,
-      ...pathParams,
-      ...pathParameters.toJSON(),
-      ...searchParams.toJSON(),
-    };
-
-    const params = new Params(mergedParams);
-
-    for (const key of Object.keys(mergedParams)) {
-      const val = decode(mergedParams[key]);
-      if (Params.pattern.params.test(val)) {
-        Params.parse(val).forEach((v, k) => {
-          v = decode(v)?.trim?.() ?? "";
-          if (lowerCase(k).endsWith("color")) {
-            params.set(k, formatHex(parseColor(decode(v))));
-          } else {
-            params.set(k, v);
-          }
-        });
-      } else {
-        if (lowerCase(key).endsWith("color")) {
-          params.set(key, formatHex(parseColor(decode(val))));
-        } else {
-          params.set(key, val);
-        }
-      }
-    }
-
-    for (const key of url.searchParams.keys()) {
-      const val = decode(url.searchParams.get(key));
-      if (lowerCase(key).endsWith("color")) {
-        params.set(key, formatHex(parseColor(decode(val))));
-      } else {
-        params.set(key, val);
-      }
-    }
-
-    // params.distinct();
-
-    url.search = "?" + params.toString();
-    const key: string = await formatKey(params.toString(), "asset::");
-
-    console.debug(
-      "[SHA-256 KEY]:\n  %s\n\n[REQUEST PARAMS]:\n  %s\n",
-      key,
-      params.toString(),
-    );
-
-    let data: any, status = 200;
-
-    if ((data = await $kv.get(key, { type: "arrayBuffer" }))) {
-      return await newResponse(data, { params, contentType, status });
-    }
-    status = 201;
-    data = await generateSVG({ params, type });
-
-    if (type === "png") {
-      data = await rasterizeSVG(data);
-    }
-
     try {
-      await $kv.put(key, data, {
-        metadata: {
-          url: url.toString(),
-          conn: connInfo,
-          date: new Date().toJSON(),
-        },
-        expirationTtl: TTL_1Y,
+      const url = new URL(req.url);
+      const type = (pathParams?.type ?? "png");
+
+      // ensure the type is only svg or png. default to png otherwise
+      if (!["png", "svg"].includes(type)) {
+        const newUrl = new URL(url);
+        newUrl.pathname = newUrl.pathname.replace(
+          /(?<=\.)([a-z0-9]{1,5})$/i,
+          "png",
+        );
+        return Response.redirect(newUrl, 301);
+      }
+
+      // use a normalized set of parameters for more aggressive caching
+      const params = collectParams(url, pathParams);
+      const cacheKey = new URL(url);
+      cacheKey.search = "?" + params.toString();
+
+      // making use of Deno's new Cache API
+      const cached = await cache?.match?.(cacheKey);
+      if (is.response(cached)) {
+        return cached;
+      }
+
+      let status = 201;
+      const headers = new Headers();
+      headers.set("Last-Modified", new Date().toISOString());
+      headers.set("Age", "0");
+
+      const contentType = (
+        `image/${type === "png" ? "png" : "svg+xml"}; charset=utf-8`
+      );
+
+      // generate the svg graphic
+      let body: Uint8Array | string = await generateSVG({ params, type });
+
+      // rasterize it as a png, if needed
+      if (type === "png") {
+        body = await rasterizeSVG(body);
+      }
+
+      const responseToCache = await createResponse(body, {
+        headers,
+        status: 200,
+        contentType,
       });
-      status = 201;
+
+      cache?.put?.(cacheKey, responseToCache);
+
+      return createResponse(body, {
+        headers,
+        status,
+        params,
+        contentType,
+      });
     } catch (err) {
       console.error(err);
+      return createResponse(DEBUG ? err : null, { status: 500 });
     }
-    return newResponse(data, { contentType, status });
   },
   /** home page request handler */
-  home: () =>
-    html({
-      colorScheme: "auto",
+  home() {
+    html.use(UnoCSS({
+      presets: [presetWind()] as any,
+      shortcuts,
+    }));
+    html.use(ColorScheme("auto"));
+    return html({
       lang: "en",
       title: meta.title,
       meta: meta as any,
-      links,
+      links: links as { [key: string]: string; href: string; rel: string }[],
       styles,
       body: <Home />,
-    }),
-  favicon: async () =>
-    newResponse(await fetch(FAVICON_URL).then((r) => r.arrayBuffer())),
-  robotsTxt: () =>
-    newResponse(`User-agent: *\nDisallow: *.png,*.svg\n`, {
-      contentType: "text/plain",
-    }),
+    });
+  },
+
+  async favicon() {
+    const body = await fetch(FAVICON_URL).then((r) => r.arrayBuffer());
+
+    const headers = new Headers();
+    headers.set("Cache-Control", CACHING.long);
+    headers.set("Content-Length", String(body.byteLength));
+    headers.set("ETag", etag.encode(body, true));
+    headers.set("Content-Type", "image/svg+xml; charset=utf-8");
+
+    return new Response(body, { headers });
+  },
+  robotsTxt() {
+    const body = `User-agent: *\nDisallow: *.png,*.svg\n`;
+    const headers = new Headers();
+    headers.set("Content-Type", "text/plain; charset=utf-8");
+    headers.set("Cache-Control", CACHING.long);
+    headers.set("Content-Length", String(body.length));
+    headers.set("ETag", etag.encode(body, false));
+    return new Response(body, { headers });
+  },
 };
 
 serve({
