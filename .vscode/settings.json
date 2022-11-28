@@ -12,9 +12,13 @@
   "editor.minimap.enabled": false,
   "terminal.integrated.profiles.linux": {
     "bash": {
-      "path": ["/usr/local/bin/bash", "/home/linuxbrew/.linuxbrew/bin/bash", "/usr/bin/bash"],
+      "path": [
+        "/usr/local/bin/bash",
+        "/home/linuxbrew/.linuxbrew/bin/bash",
+        "/usr/bin/bash"
+      ],
       "icon": "debug-breakpoint-function"
-    },
+    }
   },
   "terminal.integrated.defaultProfile.linux": "bash",
   "peacock.remoteColor": "#42b883",

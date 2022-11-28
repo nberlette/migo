@@ -134,7 +134,8 @@ export const RouteSchema = ({
       {text}
     </span>
   );
-  return <pre class="text-sm bg-gray-50/50 border border-b-2 border-gray-300 dark:!bg-black dark:!border-blue-gray-700 p-4 rounded flex flex-col w-full my-2 overflow-x-scroll">
+  return (
+    <pre class="text-sm bg-gray-50/50 border border-b-2 border-gray-300 dark:!bg-black dark:!border-blue-gray-700 p-4 rounded flex flex-col w-full my-2 overflow-x-scroll">
       <code class="whitespace-pre">
         {prefix && (
           <span class="text-gray-900 dark:!text-gray-100 text-sm font-light">
@@ -177,7 +178,8 @@ export const RouteSchema = ({
         </Link>
         <Divider text=")" />
       </code>
-  </pre>;
+    </pre>
+  );
 };
 
 export const DenoIcon = ({ ...props }: Partial<Record<string, any>>) => (
@@ -397,11 +399,13 @@ export const ParamList = () => {
       </div>
     );
   };
-  return <pre class="param-list">
+  return (
+    <pre class="param-list">
       <code class="whitespace-pre cursor-default">
         {paramList.map((data, key) => (
           <Parameter key={key} data={data} idx={key} />
         ))}
       </code>
-  </pre>;
+    </pre>
+  );
 };
