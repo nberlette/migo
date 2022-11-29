@@ -41,5 +41,10 @@
     "titleBar.inactiveBackground": "#42b88399",
     "titleBar.inactiveForeground": "#15202b99",
     "commandCenter.border": "#15202b99"
-  }
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.formatOnSave": true
+  },
+  "svg.preview.background": "white"
 }
