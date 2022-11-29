@@ -1,17 +1,14 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="deno.ns" />
-/// <reference lib="deno.window" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference lib="dom.extras" />
-
 /** @jsx h */
+
+import { Home } from "./src/home.tsx";
+import { collectParams, createResponse, generateSVG } from "./src/utils.ts";
+
 import {
   ColorScheme,
   type ConnInfo,
-  etag,
   h,
   html,
+  is,
   presetWind,
   rasterizeSVG,
   type Routes,
@@ -19,11 +16,8 @@ import {
   UnoCSS,
 } from "./deps.ts";
 
-import { assert, is } from "is";
-
 import {
   cacheName,
-  CACHING,
   DEBUG,
   FAVICON_URL,
   links,
@@ -31,14 +25,6 @@ import {
   shortcuts,
   styles,
 } from "./src/constants.ts";
-
-import { Home } from "./src/home.tsx";
-import {
-  collectParams,
-  createResponse,
-  generateSVG,
-  Params,
-} from "./src/utils.ts";
 
 if (DEBUG) {
   console.info(
@@ -50,10 +36,10 @@ if (DEBUG) {
 }
 
 const handle = {
-  /** image request handler */
+  /** the workhorse of the whole application: the image handler  */
   async image(
     req: Request,
-    connInfo: ConnInfo,
+    _ci: ConnInfo,
     pathParams: Record<string, string>,
   ) {
     try {
@@ -85,7 +71,8 @@ const handle = {
         }
       } catch { /* ignore */ }
 
-      let status = 201;
+      let status = 200;
+
       const headers = new Headers();
       headers.set("Last-Modified", new Date().toISOString());
       headers.set("Age", "0");
@@ -100,6 +87,7 @@ const handle = {
       // rasterize it as a png, if needed
       if (type === "png") {
         body = await rasterizeSVG(body);
+        is.assert.uint8Array(body);
       }
 
       try {
@@ -125,10 +113,7 @@ const handle = {
   },
   /** home page request handler */
   home() {
-    html.use(UnoCSS({
-      presets: [presetWind()] as any,
-      shortcuts,
-    }));
+    html.use(UnoCSS({ presets: [presetWind()] as any, shortcuts }));
     html.use(ColorScheme("auto"));
     return html({
       lang: "en",
@@ -139,32 +124,26 @@ const handle = {
       body: <Home />,
     });
   },
-
-  async favicon() {
-    const body = await fetch(FAVICON_URL).then((r) => r.arrayBuffer());
-
-    const headers = new Headers();
-    headers.set("Cache-Control", CACHING.long);
-    headers.set("Content-Length", String(body.byteLength));
-    headers.set("ETag", etag.encode(body, true));
-    headers.set("Content-Type", "image/svg+xml; charset=utf-8");
-
-    return new Response(body, { headers });
+  // favicon.{ico,png,svg}
+  async favicon(_req: Request, _: any, { type = "svg" }: PathParams) {
+    let body: Uint8Array | string = await (await fetch(FAVICON_URL)).text();
+    let contentType = "image/svg+xml; charset=utf-8";
+    if ((type === "png" || type === "ico") && is.nonEmptyString(body)) {
+      body = await rasterizeSVG(body);
+      contentType = "image/png; charset=utf-8";
+    }
+    return createResponse(body, { contentType });
   },
+  // robots.txt file
   robotsTxt() {
     const body = `User-agent: *\nDisallow: *.png,*.svg\n`;
-    const headers = new Headers();
-    headers.set("Content-Type", "text/plain; charset=utf-8");
-    headers.set("Cache-Control", CACHING.long);
-    headers.set("Content-Length", String(body.length));
-    headers.set("ETag", etag.encode(body, false));
-    return new Response(body, { headers });
+    return createResponse(body, { contentType: "text/plain; charset=utf-8" });
   },
 };
 
 serve({
   "/": handle.home,
-  "/favicon.:ext(ico|svg)": handle.favicon,
+  "/favicon.:type(ico|svg|png)": handle.favicon,
   "/robots.txt": handle.robotsTxt,
   "/:title.:type(png|svg)": handle.image,
   "/:title/:subtitle.:type(png|svg)": handle.image,
