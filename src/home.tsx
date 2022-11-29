@@ -26,37 +26,48 @@ export function Home() {
             </h1>
             <ColorSchemeButton class="absolute top-7 right-2" />
           </header>
-          <p class="my-1.5 md:my-2 text-sm md:text-base">
-            <ExampleImage src={site.image} url={site.repository} />
-          </p>
-          {/* Deploy With Deno button */}
-          <div class="btn-wrapper">
-            <DeployButton>Deploy with Deno</DeployButton>
-            <GitHubButton>Star on GitHub</GitHubButton>
-          </div>
+          <ExampleImage
+            width={960}
+            height={400}
+            src={site.banner}
+            url={site.repository}
+          />
 
           {/* What is this? */}
           <Heading title="What is this?">What is this?</Heading>
           <p class="my-2 md:my-2.5 text-sm sm:text-base md:text-lg text-left leading-6">
-            Migo is a free microservice to generate dynamic OpenGraph Images,
-            globally deployed on{" "}
-            <Link href="https://deno.com/deploy">Deno Deploy</Link>. Images are
-            rendered as SVG, rasterized to PNG, and cached as immutable assets
-            with{" "}
-            <Link href="https://developers.cloudflare.com/workers/runtime-apis/kv">
-              Cloudflare KV
-            </Link>, providing low-latency responses that scale.
+            This is a free microservice for generating dynamic OG images (also
+            called Twitter Cards or OpenGraph images) on the Edge, with{" "}
+            <Link href="https://deno.com/deploy">Deno Deploy</Link>. All images
+            are first rendered as SVG vectors, then rasterized to PNG, and
+            ultimately cached as immutable assets. Totally customizable, with
+            built-in support for multiple font faces, thousands of icons, and
+            millions of colors, the possibilities are virtually endless.
           </p>
           <p class="mb-2 mt-4 md:mt-5 md:mb-2.5 text-sm md:text-base text-left leading-6">
-            Read more or check out the source code{"  "}
+            Read more and check out the source code at the{"   "}
             <Link href="https://github.com/nberlette/migo#readme">
               GitHub Repository
             </Link>. Found a bug? Please{" "}
             <Link href="https://github.com/nberlette/migo/issues/new">
               create an issue
             </Link>{" "}
-            so it can be fixed. Thanks!
+            so it can be fixed. And if you find this project to be useful,
+            please{" "}
+            <Link href="https://github.com/nberlette/migo#readme">
+              give it a star on GitHub
+            </Link>. Thanks!
           </p>
+          <p class="mb-2 mt-4 md:mt-5 md:mb-2.5 text-sm md:text-base text-left leading-6">
+            &mdash;{" "}
+            <Link href="https://github.com/nberlette">Nicholas Berlette</Link>
+          </p>
+
+          {/* Deploy With Deno button */}
+          <div class="btn-wrapper">
+            <DeployButton>Deploy with Deno</DeployButton>
+            <GitHubButton>Star on GitHub</GitHubButton>
+          </div>
 
           {/* Schema */}
           <Heading title="Schema">Schema</Heading>

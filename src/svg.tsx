@@ -1,17 +1,11 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference types="../types.d.ts" />
-
 /** @jsx h */
 /** @jsxFrag Fragment */
 import {
-  colorHash,
   decode,
   formatHex,
   Fragment,
   h,
+  is,
   parseColor,
   renderToString,
   VNode,
@@ -19,35 +13,75 @@ import {
 import { adjustViewBoxValue, Params, sanitizeIcon } from "./utils.ts";
 import { CDN_URL, defaultParams, FALLBACK_ICON_URL } from "./constants.ts";
 
+const createIconUrl = (icon: string) => (
+  icon.startsWith("http")
+    ? new URL(icon).href
+    : icon.startsWith("data:")
+    ? decode(icon)
+    : new URL(`/${icon.replace(/\.svg\?.*$/i, "")}.svg`, CDN_URL).href
+);
+
 export async function generateIcon(
-  iconUrl: string,
-  _props?: IconProps,
+  iconUrl: string | URL,
+  properties?: IconProps,
 ): Promise<any> {
   const {
     iconW: width = 240,
     iconH: height = width,
-    iconColor: fill,
+    iconColor: fill = "currentColor",
     iconStroke: stroke = "none",
     iconStrokeWidth: strokeWidth = "0",
-    viewBox: _viewBox = "",
-  } = _props ?? {} as IconProps;
+    viewBox = "0 0 24 24",
+    ...props
+  } = (properties ?? {}) as IconProps;
 
-  let iconContents: string;
-  const res = await fetch(iconUrl);
-  iconContents = res.ok
-    ? (await res.text())
-    : (await (await fetch(FALLBACK_ICON_URL)).text());
+  is.assert.url(iconUrl);
 
-  const __html = sanitizeIcon(iconContents);
+  let iconContents = "", iconViewBox = viewBox;
+  let external = false;
+  const url = new URL(String(iconUrl));
+  url.search = "";
+  iconUrl = url.href;
+
+  if (iconUrl.startsWith("data")) {
+    return (
+      <defs>
+        <symbol id="icon" viewBox={viewBox} image-rendering="optimizeQuality">
+          <image href={iconUrl} width={"100%"} height={"100%"} />
+        </symbol>
+      </defs>
+    );
+  } else {
+    if (!iconUrl.startsWith("http")) {
+      iconUrl = createIconUrl(iconUrl);
+    }
+    try {
+      iconContents = await (await fetch(iconUrl)).text();
+    } catch (err) {
+      console.error(err);
+      try {
+        iconContents = await (await fetch(FALLBACK_ICON_URL)).text();
+      } catch (error) {
+        throw new Error(`Failed to fetch icon at ${iconUrl}`, {
+          cause: iconUrl,
+        });
+      }
+    }
+  }
+
+  iconContents = sanitizeIcon(iconContents);
 
   if (stroke !== "none" || +strokeWidth > 0) {
     iconContents = iconContents.replace(
-      /(?<=viewBox=['"])([^'"]+)(?=['"])/i,
-      (m: string) => _viewBox || adjustViewBoxValue(m, +strokeWidth),
+      /(?<=viewBox=['"])([^'"]+?)(?=['"])/i,
+      (m) => (
+        (iconViewBox = viewBox || adjustViewBoxValue(m, +strokeWidth)),
+          iconViewBox
+      ),
     );
   }
 
-  return <defs dangerouslySetInnerHTML={{ __html }} />;
+  return iconContents;
 }
 
 export async function generateSVG({
@@ -57,60 +91,10 @@ export async function generateSVG({
   params: Params;
   type?: "png" | "svg" | (string & Record<never, never>);
 }): Promise<string> {
-  const createIconUrl = (icon: string) => (
-    icon.startsWith("http")
-      ? new URL(icon).href
-      : new URL(`./${icon}.svg`, CDN_URL).href
-  );
-
-  let iconContents: any = "";
-  let iconType: string | null = "";
-  let icon: string | null = "twemoji:letter-m";
-
-  let iconColor = params.has("iconColor")
-    ? params.get("iconColor")
-    : "currentColor";
-  let iconUrl = createIconUrl(icon);
-
-  const mergedParams: AllProps<string, MergedParams> = {
-    ...defaultParams as any,
+  const mergedParams: AllProps = {
+    ...defaultParams,
     ...params.toJSON(),
   };
-
-  interface MergedParams extends Record<string, unknown> {
-    title: string;
-    subtitle: string;
-    width: Union<"1280">;
-    height: number | `${number}`;
-    viewBox: number | `${number}`;
-    bgColor: Union<"#fff">;
-    pxRatio: Union<"2">;
-    borderRadius: Union<"0">;
-    iconW: Union<"240">;
-    iconH: number | `${number}`;
-    iconX: number | `${number}`;
-    iconY: number | `${number}`;
-    iconStroke: Union<"none">;
-    iconStrokeWidth: Union<"0">;
-    titleFontSize: Union<"48">;
-    titleFontFamily: Union<"serif">;
-    titleFontWeight: Union<"bold">;
-    titleX: number | `${number}`;
-    titleY: number | `${number}`;
-    subtitleFontSize: Union<"32", number | `${number}`>;
-    subtitleFontFamily: FontFamily;
-    subtitleFontWeight: FontWeight;
-    subtitleX: number | `${number}`;
-    subtitleY: number | `${number}`;
-    titleColor: Union<"#123", string>;
-    titleStroke: Union<"none">;
-    titleStrokeWidth: Union<"0", number | `${number}`>;
-    titleTextAnchor: Union<"middle">;
-    subtitleColor: Union<"#345">;
-    subtitleStroke: Union<"none">;
-    subtitleStrokeWidth: Union<"0", number | `${number}`>;
-    subtitleTextAnchor: Union<"middle">;
-  }
 
   const {
     title,
@@ -118,9 +102,9 @@ export async function generateSVG({
     width = "1280",
     height = (+width / 2),
     viewBox = `0 0 ${width} ${height}`,
-    bgColor = "#fff",
+    bgColor: fill = "#fff",
     pxRatio = "2",
-    borderRadius = "0",
+    borderRadius: rx = "0",
     iconW = "240",
     iconH = iconW,
     iconX = ((+width - +iconW) / 2),
@@ -145,119 +129,132 @@ export async function generateSVG({
     subtitleStroke = "none",
     subtitleStrokeWidth = "0",
     subtitleTextAnchor = "middle",
-  }: MergedParams = mergedParams ?? {};
+  } = (mergedParams ?? {}) as AllProps;
 
-  params = new Params(mergedParams);
+  params = new Params(mergedParams as Record<string, string>);
 
-  [
-    "bgColor",
-    "titleColor",
-    "subtitleColor",
-    "iconColor",
-    "titleStroke",
-    "subtitleStroke",
-    "iconStroke",
-  ].forEach((c) => params.has(c) && formatHex(parseColor(params.get(c))));
-
-  if (params.has("iconUrl")) {
-    iconUrl = createIconUrl(decode(params.get("iconUrl")!));
-    iconType = "other";
+  for (const k in params) {
+    if (/(stroke|color)$/i.test(k)) {
+      const color = params.get(k)!;
+      params.set(k, formatHex(parseColor(color))!);
+    }
   }
 
-  if (icon) {
-    iconColor = ((iconColor === "hash")
-      ? (new colorHash().hex(`${title}`))
-      : (iconColor ?? titleColor)) as string;
-  } else {
-    iconType = "none";
-  }
+  let iconColor = params.get("iconColor") ?? titleColor;
+  let iconType = "svg";
 
-  if (/(\.svg|^data[:]image\/svg+xml)/ig.test(new URL(iconUrl).href)) {
+  const iconUrl = createIconUrl(
+    decode(
+      params.get("iconUrl") ?? params.get("icon") ?? "game-icons:sauropod-head",
+    ),
+  );
+
+  const iconContents = await generateIcon(iconUrl, {
+    iconColor,
+    iconStroke,
+    iconStrokeWidth,
+    iconW,
+    iconH,
+  } as any);
+
+  if (/(\.svg|^data[:]image\/svg\+xml)/ig.test(new URL(iconUrl).href)) {
     iconType = "svg";
-    iconContents = await generateIcon(iconUrl, {
-      iconColor,
-      iconStroke,
-      iconStrokeWidth,
-      iconW,
-      iconH,
-    } as any);
   }
 
-  const iconProps = {
-    x: iconX,
-    y: iconY,
-    width: iconW,
-    height: iconH,
-    href: iconUrl,
-  };
-
-  let IconComponent: VNode = <image {...iconProps} />;
+  const iconProps: Record<string, any> = {};
 
   if (iconType === "svg") {
     Object.assign(iconProps, {
-      href: "#icon",
-      color: iconColor || titleColor,
-      fill: "currentColor",
-      stroke: iconStroke ?? "none",
-      "stroke-width": +iconStrokeWidth || 0,
+      fill: iconColor,
+      color: iconColor,
     });
 
-    IconComponent = <use fill={iconColor ?? titleColor} {...iconProps} />;
+    if (iconStroke !== "none" || +iconStrokeWidth > 0) {
+      Object.assign(iconProps, {
+        stroke: iconStroke ?? "none",
+        "stroke-width": +iconStrokeWidth || 0,
+        "vector-effect": "non-scaling-stroke",
+      });
+    }
   }
-  const titleProps = {
-    id: "title",
-    x: +titleX,
-    y: +titleY,
-    "font-size": titleFontSize,
-    "font-family": decode(titleFontFamily),
-    "font-weight": titleFontWeight,
-    fill: titleColor,
-    color: titleColor,
-    stroke: titleStroke,
-    "stroke-width": +titleStrokeWidth,
-    "text-anchor": titleTextAnchor,
-    "dominantBaseline": "middle",
-  };
-  const subtitleProps = {
-    id: "subtitle",
-    x: +subtitleX,
-    y: +subtitleY,
-    "font-size": subtitleFontSize,
-    "font-family": decode(subtitleFontFamily),
-    "font-weight": subtitleFontWeight,
-    fill: subtitleColor,
-    color: subtitleColor,
-    stroke: subtitleStroke,
-    "stroke-width": +subtitleStrokeWidth,
-    "text-anchor": subtitleTextAnchor,
-    "dominantBaseline": "middle",
-  };
 
-  const xmlns = "http://www.w3.org/2000/svg";
-  const rx = borderRadius;
-  const fill = bgColor;
   const svg = (
     <svg
       width={+width * +pxRatio}
       height={+height * +pxRatio}
       viewBox={viewBox}
-      xmlns={xmlns}
-      role={"img"}
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label={decode(title!)}
     >
-      <title>{decode(title)}</title>
-      {iconType === "svg" && iconContents}
-      <rect fill={fill} x={0} y={0} width={width} height={height} rx={rx} />
+      <title>{decode(title!)}</title>
+      {iconContents && (
+        <defs dangerouslySetInnerHTML={{ __html: iconContents }} />
+      )}
+      <rect
+        fill={fill}
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        rx={rx || 0}
+      />
+      {iconContents && (
+        <use
+          width={iconW}
+          height={iconH}
+          x={iconX}
+          y={iconY}
+          href={"#icon"}
+          {...iconProps}
+        />
+      )}
       <g>
-        {IconComponent}
-        <text {...titleProps}>
-          <tspan>{decode(title)}</tspan>
+        <text
+          {...{
+            id: "title",
+            x: titleX,
+            y: titleY,
+            "font-size": titleFontSize,
+            "font-family": decode(titleFontFamily),
+            "font-weight": titleFontWeight,
+            fill: titleColor,
+            color: titleColor,
+            stroke: titleStroke,
+            "stroke-width": +titleStrokeWidth,
+            "text-anchor": titleTextAnchor,
+            dominantBaseline: "middle",
+          }}
+        >
+          <tspan>{decode(title!)}</tspan>
         </text>
-        <text {...subtitleProps}>
-          <tspan>{decode(subtitle)}</tspan>
+        <text
+          {...{
+            id: "subtitle",
+            x: subtitleX,
+            y: subtitleY,
+            "font-size": subtitleFontSize,
+            "font-family": decode(subtitleFontFamily),
+            "font-weight": subtitleFontWeight,
+            fill: subtitleColor,
+            color: subtitleColor,
+            stroke: subtitleStroke,
+            "stroke-width": subtitleStrokeWidth,
+            "text-anchor": subtitleTextAnchor,
+            dominantBaseline: "middle",
+          }}
+        >
+          <tspan>{decode(subtitle!)}</tspan>
         </text>
       </g>
     </svg>
   );
 
-  return renderToString(svg);
+  const DEV = (Deno.env.get("DENO_DEPLOYMENT_ID") === undefined);
+
+  return renderToString(svg, {}, {
+    pretty: DEV,
+    shallow: true,
+    xml: true,
+  });
 }

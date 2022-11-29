@@ -1,6 +1,6 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { createSrcSet, slugify } from "./utils.ts";
+import { cn, createSrcSet, slugify } from "./utils.ts";
 import { type ComponentChildren, decode, Fragment, h, is } from "../deps.ts";
 import { meta, paramList } from "./constants.ts";
 
@@ -31,24 +31,17 @@ export const Heading = ({
     "text-2xl sm:text-3xl font-semibold tracking-tight mt-8 mb-2 pb-2 border-b border-gray-200 dark:!border-blue-gray-700",
   ...props
 }: {
-  level: HeadingLevel;
-  title: string;
+  level?: HeadingLevel;
+  title?: string;
   className?: any | any[];
   [prop: string]: any;
 }) => {
-  className = is.string(className)
-    ? className.split(" ").map((s) => s.trim())
-    : is.arrayLike(className)
-    ? Object.keys(className).filter((k) => Boolean(k))
-    : is.array(className)
-    ? [...className].filter(Boolean)
-    : className;
-  className = [className].flat(2).filter(Boolean).join(" ");
+  title ??= children;
   return h(level, {
-    id: slugify(title),
-    class: className,
-    title: title,
-    ariaLabel: title,
+    id: slugify(title ?? level),
+    class: cn(className),
+    title: title ?? children,
+    ariaLabel: title ?? children,
     ...props,
   }, children);
 };
@@ -61,25 +54,36 @@ export const Link = ({
   title,
   children,
   ...props
-}: Record<string, any>) => {
+}: {
+  href: string | URL;
+  title?: string;
+  children?:
+    | string
+    | h.JSX.SignalLike<string>
+    | h.JSX.Element
+    | ComponentChildren;
+  [prop: string]: any;
+}) => {
   try {
     href = new URL(href).toString();
   } catch {
     href = `${href}`;
   }
   const isExternal = /^http/i.test(href);
-  const attr =
-    (isExternal
-      ? { ...props, target: "_blank", rel: "nofollow noreferrer" }
-      : props);
+  if (isExternal) {
+    Object.assign(props, { target: "_blank", rel: "nofollow noreferrer" });
+  }
   return (
     <a
       href={href}
-      title={title}
-      class={(props.weight ?? "font-semibold") +
-        " underline underline-1 underline-dashed underline-offset-1 relative " +
-        (props.class ?? props.className ?? "")}
-      {...attr}
+      title={title ?? (is.string(children) ? children : "")}
+      class={cn([
+        props.weight ?? "font-semibold",
+        "underline underline-1 underline-dashed underline-offset-1",
+        "relative",
+        props.class ?? props.className,
+      ])}
+      {...props}
     >
       {children}
     </a>
@@ -98,7 +102,9 @@ export const ExampleImage = ({
   ...props
 }: Record<string, any>) => (
   <div
-    class={`w-[calc(100%_+_3rem)] sm:!w-full block min-h-[${height}px] relative -left-6 -right-6 sm:!left-0 sm:!right-0`}
+    class={`w-[calc(100%_+_3rem)] sm:!w-full block min-h-[${
+      Math.round((+height * 2 / 3) / 4)
+    }] max-h-[${+height / 4}] relative -left-6 -right-6 sm:!left-0 sm:!right-0`}
   >
     <Link
       title={title}
@@ -272,7 +278,7 @@ export const GitHubButton = ({
   <Link
     href={href}
     class="btn-large group"
-    title={children ?? "View on GitHub"}
+    title={is.string(children) ? children : "View on GitHub"}
     {...props}
   >
     {icon && <GitHubIcon class="btn-icon" />}
@@ -355,23 +361,23 @@ export function SunIcon({ ...props }: { [prop: string]: any } = {}) {
   );
 }
 
-/**
- * The favicon SVG!
- */
-export function Favicon({ ...props }: { [prop: string]: any } = {}) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <linearGradient id="ukraine" x1="1" x2="1" y1="0" y2="1">
-        <stop offset="0.5" stop-color="#155ccc" />
-        <stop offset="0.5" stop-color="#fcc500" />
-      </linearGradient>
-      <path
-        fill="url(#ukraine)"
-        d="M13 7h2v8a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1h2v1h2V7m-1-5a10 10 0 0 1 10 10a10 10 0 0 1-10 10A10 10 0 0 1 2 12A10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8a8 8 0 0 0 8 8a8 8 0 0 0 8-8a8 8 0 0 0-8-8Z"
-      />
-    </svg>
-  );
-}
+//
+//   The favicon SVG!
+// ea
+// export function Favicon({ ...props }: { [prop: string]: any } = {}) {
+//   return (
+//     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+//       <linearGradient id="ukraine" x1="1" x2="1" y1="0" y2="1">
+//         <stop offset="0.5" stop-color="#155ccc" />
+//         <stop offset="0.5" stop-color="#fcc500" />
+//       </linearGradient>
+//       <path
+//         fill="url(#ukraine)"
+//         d="M13 7h2v8a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1h2v1h2V7m-1-5a10 10 0 0 1 10 10a10 10 0 0 1-10 10A10 10 0 0 1 2 12A10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8a8 8 0 0 0 8 8a8 8 0 0 0 8-8a8 8 0 0 0-8-8Z"
+//       />
+//     </svg>
+//   );
+// }
 
 export const ParamList = () => {
   const Parameter = ({ data, idx, ...props }: Record<string, any>) => {
