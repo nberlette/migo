@@ -4,9 +4,7 @@
   "deno.codeLens.test": true,
   "deno.suggest.imports.hosts": {
     "https://deno.land": true,
-    "https://x.nest.land": true,
-    "https://crux.land": true,
-    "https://x.lcas.dev": true
+    "https://x.nest.land": true
   },
   "git.enableCommitSigning": true,
   "editor.minimap.enabled": false,
