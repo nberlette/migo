@@ -7,6 +7,7 @@ import {
   is,
   json,
   kebabCase,
+  log,
   sha1,
   sha256,
 } from "../deps.ts";
@@ -134,8 +135,25 @@ export function slugify(str: string): string {
     .replace(/^[-]+|[-]+$/g, "");
 }
 
-import { log } from "~/deps.ts";
+export function cn(
+  ...clsx: (
+    | MaybeArray<string>
+    | MaybeArray<Record<string, MaybeArray<string | Boolean>>>
+  )[]
+): string {
+  const trim = (...a: any[]) => String(a.join(" ")).normalize("NFKC").trim();
+  const bool = (a: any) => a && a !== null && a !== undefined;
 
+  return [clsx].flat().map((className) =>
+    is.nonEmptyStringAndNotWhitespace(className)
+      ? className.split(" ").map(trim)
+      : is.arrayLike(className)
+      ? Object.keys(className).map(trim)
+      : is.array(className)
+      ? [...className].map(trim)
+      : null
+  ).flat().filter(bool).join(" ");
+}
 export {
   dayOfYear,
   difference,

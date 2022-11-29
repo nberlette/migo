@@ -1,28 +1,92 @@
-import { assert, decode, is } from "../deps.ts";
+import { MemoizableFn } from "https://deno.land/x/911@0.1.5/mod.ts";
+import { decode, is } from "../deps.ts";
 import { defaultParams } from "./constants.ts";
-import { camelCase, formatHex, lowerCase, parseColor } from "./utils.ts";
+import { formatHex, lowerCase, parseColor } from "./utils.ts";
 
 declare namespace Params {
   type Init =
     | string
     | string[][]
-    | Record<string, string>
+    | readonly (readonly [string, string])[]
+    | Record<string, string | string[]>
     | URLSearchParams
-    | Params;
+    | Params
+    | Iterable<[string, string]>
+    | IterableIterator<[string, string]>
+    | Map<string, string>
+    | Set<[string, string]>
+    | undefined;
+
+  export type Primitive =
+    | string
+    | number
+    | bigint
+    | boolean
+    | symbol
+    | null
+    | undefined;
+  export type Printable = Exclude<Primitive, symbol>;
+
+  interface Options {
+    aliases?: {
+      [originalKey: string]: Maybe<string> | Maybe<string>[];
+    };
+    exclude?: string[];
+    collect?: boolean | string[];
+  }
+
+  interface Context {
+    index: number;
+    /** The Options object. */
+    config: Options;
+    /** The previous key/value pair. */
+    prev: [string, string];
+    /** The parsed parameters. */
+    memo: Record<string, unknown | unknown[]>;
+  }
 }
 
-export class Params extends URLSearchParams implements Params {
-  private static readonly paramsPattern = /(?:|[&;])([^&;#=]+)[=]([^&;#]*)/g;
-  private static readonly groupsPattern = /(?<=[^&;#]*)[&;](?=[^&;#]*)/g;
-  private static readonly valuesPattern = /(?<=[^&;#=]+)[=](?=[^&;#]*)/g;
+export class Params extends URLSearchParams {
+  #defaults: Record<string, string> = defaultParams;
+  #aliases: Params.Options["aliases"] & {} = {};
+  #list: [string, string][] = [];
 
-  constructor(init?: Params.Init) {
-    if (init) {
-      init = (Params.validate(init) && Params.parse(init)) ||
-        new URLSearchParams();
-      return super(init), this;
+  constructor(initial?: string);
+  constructor(inherit: Params | URLSearchParams);
+  constructor(
+    entries:
+      | readonly (readonly string[])[]
+      | readonly (readonly [string, string])[]
+      | Iterable<readonly [string, string]>,
+  );
+  constructor(initial: Record<string, string>);
+  constructor(...params: Params.Init[]);
+  constructor(...init: any[]) {
+    super();
+    if (init.length === 0) {
+      this.list = [];
+      return this;
+    } else {
+      for (const entry of init) {
+        if (Params.validate(entry)) {
+          this.list = [...this.list, ...Params.parse(entry)];
+        }
+      }
     }
-    return super(), this;
+    return this;
+  }
+
+  get list() {
+    return this.#list;
+  }
+
+  set list(items: [string, string][]) {
+    this.#list = []; // wipe all current keys
+    this.clear();
+    for (const [key, value] of items) {
+      super.append(key, value);
+    }
+    this.#list = [...super.entries()];
   }
 
   /**
@@ -31,27 +95,31 @@ export class Params extends URLSearchParams implements Params {
    * @returns
    */
   static validate(value: unknown): value is Params.Init {
-    return (
-      (typeof value === "string" && Params.pattern.params.test(value)) ||
-      (Array.isArray(value) && Array.isArray(value[1])) ||
-      (value instanceof Params || value instanceof URLSearchParams) ||
-      (Object.prototype.toString.call(value) === "[object Object]" && (
-        Object.keys(value as Record<string, unknown>).length === 0 ||
-        Object.keys(value as Record<string, unknown>)
-          .every((v) => typeof v === "string")
-      ))
-    );
+    // check if its a string that matches the accepted syntax
+    if (is.string(value) && this.pattern.params.test(value)) {
+      return true;
+    }
+    // check if its a valid set of entries
+    if (
+      is.entries<string, string>(value) && is.all((v) => (
+        is.entry(v) && is.nonEmptyString(v[0]) && is.string(v[1])
+      ), ...value)
+    ) {
+      return true;
+    }
+    // check if its an existing instance
+    if (value instanceof Params || value instanceof URLSearchParams) {
+      return true;
+    }
+    // noopdd
+    return false;
   }
 
-  static get pattern(): {
-    [K in "params" | "groups" | "values"]: RegExp;
-  } {
-    return {
-      params: Params.paramsPattern,
-      groups: Params.groupsPattern,
-      values: Params.valuesPattern,
-    };
-  }
+  static readonly pattern = {
+    params: /(?:|[&;])([^&;#=]+)[=]([^&;#]*)/dg,
+    groups: /(?<=[^&;#]*)[&;](?=[^&;#]*)/dgy,
+    values: /(?<=[^&;#=]+)[=](?=[^&;#]*)/dgy,
+  } as const;
 
   /**
    * Parse parameters from a string, array of entries, object literal, or
@@ -60,27 +128,90 @@ export class Params extends URLSearchParams implements Params {
    * @param value raw value to be parsed
    * @returns
    */
-  static parse<T extends Params.Init>(value: T) {
+  static parse(
+    value: Params.Init,
+    options?: Params.Options,
+  ): [string, string][] {
     const init = new URLSearchParams();
     if (Params.validate(value)) {
+      // stringified parameters
       if (
-        (Array.isArray(value) && Array.isArray(value[0])) ||
-        (typeof value === "object" &&
-          !(value instanceof URLSearchParams || value instanceof Params))
+        is.nonEmptyStringAndNotWhitespace(value) &&
+        this.pattern.params.test(value)
       ) {
-        value = new URLSearchParams(value) as T;
+        const params = value.split(this.pattern.groups) ?? [];
+        for (const param of params) {
+          const [key, val] = param.split(this.pattern.values);
+          init.append(key, val);
+        }
       }
-      return `${value.toString()}`
-        .split(Params.pattern.groups)
-        .map((p) => p.split(Params.pattern.values))
-        .reduce((params, [key, val]) => (
-          (key = decode(key.trim())),
-            params.append(key, decode(val?.trim?.() ?? "")),
-            params.sort(),
-            params
-        ), init);
+      // entries
+      // [ ...[['f1', 's'], ['f2': 't']]]
+      if (is.array(value, is.entry<string, string>)) {
+        for (const [key, val] of value) {
+          init.append(key, val);
+        }
+      }
+      if (
+        is.nonEmptySet<[string, string]>(value) ||
+        is.nonEmptyMap<string, string>(value) ||
+        is.nonEmptyObject<string, string>(value)
+      ) {
+        const entries = Object.entries(value);
+        for (const [key, val] of entries) {
+          init.append(key, val);
+        }
+      }
+
+      // url search params and params instances
+      if (
+        is.instanceOf(value, Params) ||
+        is.instanceOf(value, URLSearchParams)
+      ) {
+        for (const [key, val] of value.entries()) {
+          init.append(key, val);
+        }
+      }
     }
-    return init;
+    return [...init] as [string, string][]; // pass all initialization entries
+  }
+
+  static format<T extends Params.Init>(
+    ...params: T[]
+  ): Params {
+    const paramStringToEntries = (s: string): string[][] =>
+      `${s ?? ""}`.split(/(?<=\w+)([;&])(?=\w+)/).map((p) => {
+        const [k, v] = p?.split?.(/[=]/, 2).map((s) => decode(s.trim()));
+        return [k, v];
+      }).filter(([k, v]) =>
+        Boolean(k) && Boolean(v) && (v != null && v != "" && k != "&")
+      );
+
+    const p = (params ?? []).reduce(
+      (acc, cur) => {
+        const entries: any = (typeof cur === "string")
+          ? paramStringToEntries(cur)
+          : (is.array(cur))
+          ? [...cur].filter(Boolean)
+          : (cur instanceof URLSearchParams || cur instanceof Params)
+          ? [...cur.entries()].filter(Boolean)
+          : [...Object.entries(cur ?? {})].filter(Boolean);
+        return {
+          ...acc,
+          ...Object.fromEntries((entries ?? []).filter(Boolean)),
+        };
+      },
+      {} as Record<string, string>,
+    );
+
+    return new Params(p).distinct();
+  }
+
+  clear(): Params {
+    for (const key of this.keys()) {
+      this.delete(key); // wipe all previous keys
+    }
+    return this;
   }
 
   /**
@@ -100,30 +231,6 @@ export class Params extends URLSearchParams implements Params {
     return this;
   }
 
-  static get [Symbol.toStringTag](): "Params" {
-    return "Params" as const;
-  }
-
-  get [Symbol.species]() {
-    return Params;
-  }
-
-  static get [Symbol.unscopables]() {
-    return {
-      toJSON: false,
-    };
-  }
-
-  [Symbol.toPrimitive](hint: "number" | "string" | "default") {
-    if (hint === "number") {
-      return this.size;
-    }
-    if (hint === "string") {
-      return this.toString();
-    }
-    return JSON.stringify(this);
-  }
-
   get size(): number {
     try {
       return [...this.keys()].length;
@@ -132,14 +239,61 @@ export class Params extends URLSearchParams implements Params {
     }
   }
 
-  get length(): number {
-    return this.size;
+  toJSON() {
+    return Object.fromEntries([...this]);
   }
 
-  toJSON() {
-    return Object.fromEntries([...this.entries()!]);
+  *[Symbol.iterator](): IterableIterator<[string, string]> {
+    for (const [key, value] of this.entries()) {
+      yield [key, value];
+    }
   }
 }
+
+Reflect.defineProperty(Params, Symbol.toStringTag, {
+  value: "ParamsConstructor",
+});
+
+Reflect.defineProperty(Params.prototype, Symbol.toStringTag, {
+  value: "Params",
+});
+
+Reflect.defineProperty(Params.prototype, "length", {
+  get() {
+    return this.size ?? 0;
+  },
+  enumerable: false,
+  configurable: false,
+});
+
+Reflect.defineProperty(Params.prototype, Symbol.for("Deno.customInspect"), {
+  value(inspect: typeof Deno.inspect): string {
+    const options: Deno.InspectOptions = {
+      colors: true,
+      compact: true,
+      depth: 4,
+      getters: true,
+      showHidden: false,
+      sorted: true,
+      strAbbreviateSize: 128,
+      iterableLimit: 50,
+      trailingComma: true,
+    };
+    return `${this.constructor.name} ${
+      inspect({
+        ...this,
+      }, options)
+    }`;
+  },
+});
+
+Reflect.defineProperty(Params.prototype, Symbol.toPrimitive, {
+  value(hint: "number" | "string" | "default") {
+    if (hint === "number") return this.size;
+    if (hint === "string") return this.toString();
+    return JSON.stringify(this);
+  },
+});
 
 export declare type URLSearchParamsInit =
   | string
@@ -244,7 +398,7 @@ export function collectParams<
   for (const key in mergedParams) {
     const val = decode(mergedParams[key as keyof typeof mergedParams]);
     if (Params.pattern.params.test(val)) {
-      Params.parse(val).forEach((v, k) => {
+      Params.parse(val).forEach(([k, v]) => {
         v = decode(v)?.trim?.() ?? "";
         if (lowerCase(k).endsWith("color")) {
           params.set(k, formatHex(parseColor(decode(v)))!);
