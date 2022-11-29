@@ -15,13 +15,14 @@
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "jsxImportSource": "peact"
+    "jsxImportSource": "preact"
   },
   "fmt": {
     "files": {
       "exclude": [
         "static",
-        "./{.vscode,.devcontainer,.gitpod.yml,.git*,.env*}"
+        "./{.vscode,.devcontainer,.gitpod.yml,.git*,.env*}",
+        "README.md"
       ]
     }
   },
@@ -29,7 +30,11 @@
     "rules": {
       "exclude": [
         "no-explicit-any",
-        "import-prefix-missing"
+        "import-prefix-missing",
+        "no-bad-types",
+        "no-empty-interface",
+        "ban-types",
+        "ban-ts-comment"
       ]
     }
   },
