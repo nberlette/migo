@@ -46,7 +46,7 @@ export const defaultParams = {
   iconW: "240",
   iconH: "240",
   bgColor: "f0f0f0",
-  titleColor: "#112233",
+  titleColor: "112233",
   titleFontSize: "64",
   subtitleFontSize: "36",
 };

@@ -31,8 +31,8 @@ export const Heading = ({
     "text-2xl sm:text-3xl font-semibold tracking-tight mt-8 mb-2 pb-2 border-b border-gray-200 dark:!border-blue-gray-700",
   ...props
 }: {
-  level?: HeadingLevel;
-  title?: string;
+  level: HeadingLevel;
+  title: string;
   className?: any | any[];
   [prop: string]: any;
 }) => {
@@ -43,7 +43,7 @@ export const Heading = ({
     : is.array(className)
     ? [...className].filter(Boolean)
     : className;
-  className = [className].flat(Infinity).filter(Boolean).join(" ");
+  className = [className].flat(2).filter(Boolean).join(" ");
   return h(level, {
     id: slugify(title),
     class: className,
@@ -286,9 +286,10 @@ export const GitHubButton = ({
  * Toggle between the light/dark side of the force.
  */
 export function ColorSchemeButton({ ...props }: { [prop: string]: any } = {}) {
-  return ( // @ts-ignore bad types
+  return (
     <button
       class="btn-colorscheme"
+      // @ts-ignore jankyness
       onclick="setColorScheme((localStorage.getItem('color-scheme')==='dark'?'light':'dark'))"
       {...props}
     >
@@ -373,7 +374,7 @@ export function Favicon({ ...props }: { [prop: string]: any } = {}) {
 }
 
 export const ParamList = () => {
-  const Parameter = ({ data, idx, ...props }) => {
+  const Parameter = ({ data, idx, ...props }: Record<string, any>) => {
     const [param, value, ...comments]: string[] = data ?? [];
     const isNumeric = /^[0-9]+$/.test(value);
     const quotes = isNumeric ? "" : '"';

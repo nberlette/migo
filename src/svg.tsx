@@ -14,6 +14,7 @@ import {
   h,
   parseColor,
   renderToString,
+  VNode,
 } from "../deps.ts";
 import { adjustViewBoxValue, Params, sanitizeIcon } from "./utils.ts";
 import { CDN_URL, defaultParams, FALLBACK_ICON_URL } from "./constants.ts";
@@ -53,8 +54,8 @@ export async function generateSVG({
   params,
   type = "png",
 }: {
-  params?: Params;
-  type?: string;
+  params: Params;
+  type?: "png" | "svg" | (string & Record<never, never>);
 }): Promise<string> {
   const createIconUrl = (icon: string) => (
     icon.startsWith("http")
@@ -62,18 +63,54 @@ export async function generateSVG({
       : new URL(`./${icon}.svg`, CDN_URL).href
   );
 
-  let iconContents: any = "",
-    iconType: string | null = "",
-    icon: string | null = "twemoji:letter-m",
-    iconColor = params.has("iconColor")
-      ? params.get("iconColor")
-      : "currentColor";
+  let iconContents: any = "";
+  let iconType: string | null = "";
+  let icon: string | null = "twemoji:letter-m";
+
+  let iconColor = params.has("iconColor")
+    ? params.get("iconColor")
+    : "currentColor";
   let iconUrl = createIconUrl(icon);
 
-  const mergedParams: AllProps<string> = {
+  const mergedParams: AllProps<string, MergedParams> = {
     ...defaultParams as any,
     ...params.toJSON(),
   };
+
+  interface MergedParams extends Record<string, unknown> {
+    title: string;
+    subtitle: string;
+    width: Union<"1280">;
+    height: number | `${number}`;
+    viewBox: number | `${number}`;
+    bgColor: Union<"#fff">;
+    pxRatio: Union<"2">;
+    borderRadius: Union<"0">;
+    iconW: Union<"240">;
+    iconH: number | `${number}`;
+    iconX: number | `${number}`;
+    iconY: number | `${number}`;
+    iconStroke: Union<"none">;
+    iconStrokeWidth: Union<"0">;
+    titleFontSize: Union<"48">;
+    titleFontFamily: Union<"serif">;
+    titleFontWeight: Union<"bold">;
+    titleX: number | `${number}`;
+    titleY: number | `${number}`;
+    subtitleFontSize: Union<"32", number | `${number}`>;
+    subtitleFontFamily: FontFamily;
+    subtitleFontWeight: FontWeight;
+    subtitleX: number | `${number}`;
+    subtitleY: number | `${number}`;
+    titleColor: Union<"#123", string>;
+    titleStroke: Union<"none">;
+    titleStrokeWidth: Union<"0", number | `${number}`>;
+    titleTextAnchor: Union<"middle">;
+    subtitleColor: Union<"#345">;
+    subtitleStroke: Union<"none">;
+    subtitleStrokeWidth: Union<"0", number | `${number}`>;
+    subtitleTextAnchor: Union<"middle">;
+  }
 
   const {
     title,
@@ -108,7 +145,7 @@ export async function generateSVG({
     subtitleStroke = "none",
     subtitleStrokeWidth = "0",
     subtitleTextAnchor = "middle",
-  } = mergedParams ?? {};
+  }: MergedParams = mergedParams ?? {};
 
   params = new Params(mergedParams);
 
@@ -122,53 +159,30 @@ export async function generateSVG({
     "iconStroke",
   ].forEach((c) => params.has(c) && formatHex(parseColor(params.get(c))));
 
-  if (params.has("iconUrl") || params.has("icon")) {
-    if (params.has("icon")) {
-      icon = decode(params.get("icon"));
-    }
-    iconUrl = createIconUrl(params.get("iconUrl") ?? icon);
+  if (params.has("iconUrl")) {
+    iconUrl = createIconUrl(decode(params.get("iconUrl")!));
     iconType = "other";
-
-    if (icon != null) {
-      iconColor = ((iconColor === "hash")
-        ? (new colorHash().hex(`${title}`))
-        : (iconColor ?? titleColor)) as string;
-    } else {
-      iconType = "none";
-    }
-
-    if (/(\.svg|^data[:]image\/svg+xml)/ig.test(new URL(iconUrl).href)) {
-      iconType = "svg";
-      iconContents = await generateIcon(iconUrl, {
-        iconColor,
-        iconStroke,
-        iconStrokeWidth,
-        iconW,
-        iconH,
-      } as any);
-    }
-  } else {
-    iconType = "none";
-    icon = null;
   }
 
-  const svgProps = {
-    xmlns: "http://www.w3.org/2000/svg",
-    "xmlns:xlink": "http://www.w3.org/1999/xlink",
-    preserveAspectRatio: "xMidYMid meet",
-    role: "img",
-    viewBox,
-    width: `${+width * +pxRatio}`,
-    height: `${+height * +pxRatio}`,
-  };
-  const rectProps = {
-    fill: bgColor,
-    x: 0,
-    y: 0,
-    width,
-    height,
-    rx: borderRadius,
-  };
+  if (icon) {
+    iconColor = ((iconColor === "hash")
+      ? (new colorHash().hex(`${title}`))
+      : (iconColor ?? titleColor)) as string;
+  } else {
+    iconType = "none";
+  }
+
+  if (/(\.svg|^data[:]image\/svg+xml)/ig.test(new URL(iconUrl).href)) {
+    iconType = "svg";
+    iconContents = await generateIcon(iconUrl, {
+      iconColor,
+      iconStroke,
+      iconStrokeWidth,
+      iconW,
+      iconH,
+    } as any);
+  }
+
   const iconProps = {
     x: iconX,
     y: iconY,
@@ -176,6 +190,9 @@ export async function generateSVG({
     height: iconH,
     href: iconUrl,
   };
+
+  let IconComponent: VNode = <image {...iconProps} />;
+
   if (iconType === "svg") {
     Object.assign(iconProps, {
       href: "#icon",
@@ -184,6 +201,8 @@ export async function generateSVG({
       stroke: iconStroke ?? "none",
       "stroke-width": +iconStrokeWidth || 0,
     });
+
+    IconComponent = <use fill={iconColor ?? titleColor} {...iconProps} />;
   }
   const titleProps = {
     id: "title",
@@ -213,15 +232,23 @@ export async function generateSVG({
     "text-anchor": subtitleTextAnchor,
     "dominantBaseline": "middle",
   };
+
+  const xmlns = "http://www.w3.org/2000/svg";
+  const rx = borderRadius;
+  const fill = bgColor;
   const svg = (
-    <svg {...svgProps}>
+    <svg
+      width={+width * +pxRatio}
+      height={+height * +pxRatio}
+      viewBox={viewBox}
+      xmlns={xmlns}
+      role={"img"}
+    >
       <title>{decode(title)}</title>
       {iconType === "svg" && iconContents}
-      <rect {...rectProps} />
+      <rect fill={fill} x={0} y={0} width={width} height={height} rx={rx} />
       <g>
-        {iconType === "svg"
-          ? <use fill={iconColor ?? titleColor} {...iconProps} />
-          : (iconType !== "none" && <image {...iconProps} />)}
+        {IconComponent}
         <text {...titleProps}>
           <tspan>{decode(title)}</tspan>
         </text>
