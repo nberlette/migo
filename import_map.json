@@ -35,7 +35,8 @@
     "is": "https://deno.land/x/dis@0.2.0/mod.ts",
     "this": "https://deno.land/x/this@0.160.1/mod.ts",
     "this/": "https://deno.land/x/this@0.160.1/",
-    "serialize": "https://deno.land/x/serialize@1.0.0-rc.2/mod.ts"
+    "serialize": "https://deno.land/x/serialize@1.0.0-rc.2/mod.ts",
+    "storage": "https://deno.land/x/sqlite@v3.7.0/mod.ts"
   },
   "scopes": {}
 }

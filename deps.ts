@@ -4,8 +4,14 @@ export { default as UnoCSS } from "htm/plugins/unocss.ts";
 export { default as ColorScheme } from "htm/plugins/color-scheme.ts";
 export * from "htm/mod.ts";
 
-export { default as presetWind } from "@unocss/preset-wind.ts";
-export { type ConnInfo, type Routes, serve, Status, STATUS_TEXT } from "sift";
+export { default as presetWind } from "aleph/lib/@unocss/preset-wind.ts";
+export {
+  type ConnInfo,
+  type Routes,
+  serve,
+  Status,
+  STATUS_TEXT,
+} from "sift/mod.ts";
 // export * from "preact";
 export { render as renderToString } from "preact/render";
 export { default as colorHash } from "colorhash";
