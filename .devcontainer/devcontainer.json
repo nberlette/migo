@@ -1,0 +1,37 @@
+{
+  "name": "Deno",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Set *default* container specific settings.json values on container create.
+      "settings": {
+        // Enables the project as a Deno project
+        "deno.enable": true,
+        // Enables Deno linting for the project
+        "deno.lint": true,
+        // Sets Deno as the default formatter for the project
+        "editor.defaultFormatter": "denoland.vscode-deno",
+        "editor.minimap.enabled": false
+      },
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "denoland.vscode-deno",
+        "mutantdino.resourcemonitor",
+        "editorconfig.editorconfig"
+      ]
+    }
+  },
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
+    "ghcr.io/devcontainers-contrib/features/deno:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:0": {},
+    "ghcr.io/dhoeric/features/act:1": {},
+    "ghcr.io/rio/features/chezmoi:1": {}
+  }
+}
