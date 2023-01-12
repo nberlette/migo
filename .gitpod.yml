@@ -1,61 +1,90 @@
-image: nberlette/gitpod-enhanced:latest
+image: nberlette/gitpod-enhanced
 
 tasks:
-  - # WARNING: remove this if you share your workspaces!
-    before: |
-      cd "$GITPOD_REPO_ROOT" || exit $?;
-      [ -n "$DOTENV_VAULT" ] && [ ! -e .env.vault ] && 
-        echo "DOTENV_VAULT=$DOTENV_VAULT" > .env.vault;
-      [ -n "$DOTENV_ME" ] && [ ! -e .env.me ] &&
-        echo "DOTENV_ME=$DOTENV_ME" > .env.me;
-      if [ -e .env.me ] && [ -e .env.vault ] && [ ! -e .env ]; then
-        which dotenv-vault &>/dev/null && 
-          dotenv-vault pull || npx -y dotenv-vault@latest pull;
-        # expose the .env variables to current environment
-        [ -e .env ] && { set -a; source .env; set +a; }
+  - name: "Deno"
+    env:
+      DENO_INSTALL: /home/gitpod/.deno
+    init: >- # run on prebuilds only
+      cd "$GITPOD_REPO_ROOT" || exit $?
+
+      # if deno binary exists in path, ensure that it is not from homebrew
+      command -v deno 2>/dev/null | grep -q "linuxbrew" &&
+        brew uninstall deno &>/dev/null;
+
+      # ensure the deno install dir exists
+      [ ! -d "$DENO_INSTALL" ] && mkdir -p "$DENO_INSTALL" &>/dev/null;
+      if ! echo -n "$PATH" | grep -q "$DENO_INSTALL/bin"; then
+        export PATH="${DENO_INSTALL:+$DENO_INSTALL/bin:}${PATH-}"
       fi
-    # make sure we have deno installed
-    init: |
-      export DENO_INSTALL_ROOT="$HOME/.deno/bin"
-      export PATH="$DENO_INSTALL_ROOT:$PATH"
-      which deno &>/dev/null || brew install deno --quiet --overwrite
-      gp sync-done listo
-  - # proceed once we are ready
-    init: gp sync-await listo
-    command: deno task dev 2>&1 || deno task
+
+      if ! which deno &>/dev/null; then
+        echo 'export PATH="'$DENO_INSTALL'/bin:${PATH-}"' >> ~/.bashrc
+        # download and install the latest release from deno.land
+        curl -fsSL https://deno.land/install.sh | sh -
+      fi
+
+      # ensure deno.lock is ignored
+      grep -q "deno.lock" "${GITPOD_REPO_ROOT:-.}/.gitignore" ||
+        echo -e $'\ndeno.lock\n' >> "${GITPOD_REPO_ROOT:-.}/.gitignore";
+
+      exit 0 #all is well, proceed with the task
+    before: >- # run before every startup
+      # upgrade to latest deno canary plz
+      deno upgrade --canary --unstable 2>/dev/null
+
+      # re-cache our dependency files
+      for _f in ./**/deps.* ./deps.* ./import{-,_,}map.*; do
+        [ -f "$_f" ] && deno cache --reload "$_f" --lock-write 2>&1
+      done
+
+      exit 0 #all is well, proceed with to command
+    command: deno task >&2
 
 ports:
-  - name: "Develop"
-    port: 8000
+  - name: "Dev (private)"
+    port: 8000-8888
     visibility: private
     onOpen: open-preview
-  - name: "Preview"
-    port: 8080
-    visibility: public
-    onOpen: notify
 
 github:
   prebuilds:
-    master: true
     branches: true
     pullRequests: true
+    # custom label to add to a PR
+    addLabel: "gitpod-prebuild"
+    # enable prebuilds for pull requests coming from forks
     pullRequestsFromForks: true
-    addLabel: true
-    addBadge: true
-    addCheck: true
+    # adds a check to prevent merging PR's if the prebuild fails
+    addCheck: "prevent-merge-on-error"
+
+gitConfig:
+  core.autocrlf: "false"
+  core.eol: lf
+  tag.gpgsign: "true"
+  commit.gpgsign: "true"
+  core.hooksPath: ".github/hooks"
+  hooks.silent: "false"
+  hooks.debug: "false"
+  hooks.commit.test: "deno test -A --unstable --no-check 2>&1"
+  hooks.commit.fmt: "deno fmt"
+  hooks.commit.lint: "false"
+  hooks.commit.message.enabled: "false"
 
 vscode:
   extensions:
-    - github.copilot-nightly
-    - GitHub.copilot-labs
     - denoland.vscode-deno
-    - vsls-contrib.gistfs
-    - github.vscode-codeql
-    - cschleiden.vscode-github-actions
+    - umbo.vscode-velociraptor
+    - Thinker.deno-standard-lib-snippets
     - editorconfig.editorconfig
-    - jock.svg
+    - quicktype.quicktype
+    - skarab42.ts-to-md
+    - yzhang.markdown-all-in-one
+    - bierner.markdown-preview-github-styles
+    - vsls-contrib.gistfs
+    - gitpod.gitpod-desktop
+    - gitpod.gitpod-remote-ssh
+    - github.copilot-nightly
+    - github.copilot-labs
     - antfu.iconify
     - antfu.unocss
-    - redhat.vscode-yaml
-    - jacano.vscode-pnpm
-    - christian-kohler.path-intellisense
+    - jock.svg
