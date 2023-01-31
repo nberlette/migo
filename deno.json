@@ -1,10 +1,14 @@
 {
-  "importMap": "import_map.json",
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "tasks": {
+    "dev": "deno run -A --unstable --watch=. main.tsx",
+    "preview": "deno run --allow-net --allow-env main.tsx",
+    "test": "deno test -A --unstable"
+  },
   "compilerOptions": {
     "lib": [
       "dom",
       "dom.iterable",
-      "dom.asynciterable",
       "dom.extras",
       "deno.ns",
       "deno.unstable"
@@ -16,6 +20,32 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "jsxImportSource": "preact"
+  },
+  "lock": true,
+  "imports": {
+    "~/": "./",
+    "/": "./",
+    "./": "./",
+    "preact": "https://esm.sh/preact@10.11.0",
+    "preact/render": "https://esm.sh/preact-render-to-string@5.2.5?external=preact&target=deno",
+    "preact/jsx-runtime": "https://esm.sh/preact@10.11.0/jsx-runtime",
+    "preact/jsx-dev-runtime": "https://esm.sh/preact@10.11.0/jsx-dev-runtime",
+    "preact/": "https://esm.sh/preact@10.11.0/",
+    "case": "https://deno.land/x/case@2.1.1/mod.ts",
+    "culori": "https://deno.land/x/culori@v2.1.0-alpha.0/index.js?dts",
+    "culori/": "https://deno.land/x/culori@v2.1.0-alpha.0/",
+    "htm": "https://deno.land/x/htm@0.1.2/mod.ts",
+    "htm/": "https://deno.land/x/htm@0.1.2/",
+    "sift": "https://deno.land/x/sift@0.6.0/mod.ts",
+    "colorhash": "https://deno.land/x/color_hash@v2.0.1/mod.ts",
+    "resvg": "https://deno.land/x/resvg_wasm@0.2.0/mod.ts",
+    "911": "https://deno.land/x/911@0.1.5/mod.ts",
+    "etag": "https://deno.land/x/etag@0.2.0/mod.ts",
+    "is": "https://x.nest.land/dis@0.3.0-rc.3/mod.ts",
+    "this": "https://deno.land/x/this@0.160.1/mod.ts",
+    "this/": "https://deno.land/x/this@0.160.1/",
+    "serialize": "https://deno.land/x/serialize@1.1.0/mod.ts",
+    "sqlite": "https://deno.land/x/sqlite@v3.7.0/mod.ts"
   },
   "fmt": {
     "files": {
@@ -37,10 +67,5 @@
         "ban-ts-comment"
       ]
     }
-  },
-  "tasks": {
-    "dev": "deno run -A --unstable --watch=. main.tsx",
-    "preview": "deno run --allow-net --allow-env main.tsx",
-    "test": "deno test -A --unstable"
   }
 }

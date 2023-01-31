@@ -1,7 +1,7 @@
 /** @jsx h */
 
-import { Home } from "./src/home.tsx";
-import { collectParams, createResponse, generateSVG } from "./src/utils.ts";
+import { Home } from "./pages/home.tsx";
+import { collectParams, createResponse, generateSVG } from "./helpers/utils.ts";
 
 import {
   ColorScheme,
@@ -24,7 +24,7 @@ import {
   meta,
   shortcuts,
   styles,
-} from "./src/constants.ts";
+} from "./lib/constants.ts";
 
 if (DEBUG) {
   console.info(
